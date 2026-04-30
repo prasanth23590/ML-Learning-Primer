@@ -254,27 +254,45 @@ body::before {
 /* CONV DEMO — 3D */
 .conv-demo { max-width: 1100px; width: 100%; }
 
+.conv-3d-layout {
+  display: grid;
+  grid-template-columns: 1fr 40px 1fr;
+  align-items: center;
+  gap: 10px;
+  margin: 32px 0;
+}
+
+@media (max-width: 900px) {
+  .conv-3d-layout { grid-template-columns: 1fr; justify-items: center; }
+  .conv-layout-arrow { transform: rotate(90deg); }
+}
+
+.conv-layout-arrow {
+  color: var(--text-muted);
+  font-size: 28px;
+  text-align: center;
+}
+
 .conv-3d-scene {
-  perspective: 1200px;
+  perspective: 1000px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 32px 0;
-  min-height: 400px;
+  min-height: 360px;
   position: relative;
 }
 
 .conv-3d-container {
   transform-style: preserve-3d;
-  transform: rotateX(25deg) rotateY(-15deg) rotateZ(0deg);
+  transform: rotateX(20deg) rotateY(-12deg);
   position: relative;
-  width: 320px;
-  height: 320px;
+  width: 300px;
+  height: 300px;
   transition: transform 0.5s ease;
 }
 
 .conv-3d-container:hover {
-  transform: rotateX(20deg) rotateY(-10deg) rotateZ(0deg);
+  transform: rotateX(15deg) rotateY(-8deg);
 }
 
 .conv-layer {
@@ -307,12 +325,6 @@ body::before {
   justify-items: center;
 }
 
-.conv-layer-output {
-  transform: translateZ(-60px);
-  z-index: 0;
-  opacity: 0.85;
-}
-
 .img-cell {
   border-radius: 2px;
   position: relative;
@@ -337,50 +349,55 @@ body::before {
   justify-content: center;
 }
 
-.output-3d-cell {
-  border-radius: 2px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 9px;
-  color: rgba(255,255,255,0.7);
-  background: rgba(6,182,212,0.1);
-  border: 1px solid rgba(6,182,212,0.15);
-  transition: background 0.3s, border-color 0.3s;
-}
-
-.output-3d-cell.computed {
-  background: rgba(6,182,212,0.3);
-  border-color: rgba(6,182,212,0.5);
-  color: white;
-  font-weight: 600;
-}
-
-.conv-side-panel {
-  position: absolute;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
+/* Output feature map — right side */
+.conv-output-panel {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  z-index: 10;
+  align-items: center;
+  gap: 12px;
 }
 
-.conv-side-panel .glass-card { padding: 16px; }
-
-.conv-info-label {
-  font-size: 10px;
+.conv-output-label {
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--text-muted);
-  margin-bottom: 6px;
 }
 
-.conv-info-value {
-  font-size: 14px;
+.conv-output-grid {
+  display: grid;
+  gap: 2px;
+  padding: 16px;
+  background: rgba(6,182,212,0.04);
+  border: 1px solid rgba(6,182,212,0.15);
+  border-radius: var(--radius-md);
+}
+
+.output-3d-cell {
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.3);
+  background: rgba(6,182,212,0.06);
+  border: 1px solid rgba(6,182,212,0.1);
+  transition: all 0.3s ease;
+  width: 38px;
+  height: 38px;
+}
+
+.output-3d-cell.computed {
+  color: white;
   font-weight: 600;
-  color: var(--text-primary);
+  border-color: rgba(6,182,212,0.4);
+}
+
+.output-3d-cell.current {
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 8px rgba(139,92,246,0.4);
+  transform: scale(1.05);
 }
 
 .conv-computation {
@@ -758,7 +775,11 @@ body::before {
             <li>Typical size: 224x224x3 for classification</li>
           </ul>
         </div>
-        <div class="stage-visual" id="inputVisual"></div>
+        <div class="stage-visual" id="inputVisual" style="flex-direction: column; gap: 12px; padding: 16px;">
+          <img src="mountain.jpg" alt="Torres del Paine - Input Image" style="width: 100%; max-width: 280px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);" id="srcImage">
+          <div style="font-size: 11px; color: var(--text-muted); text-align: center;">Torres del Paine, Patagonia &mdash; 224x224x3 tensor</div>
+          <div id="pixelSampleGrid" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px; width: fit-content; margin: 0 auto;"></div>
+        </div>
       </div>
       <div class="insight-box">
         "The network sees numbers, not pictures — every pixel is just a number with no inherent meaning."
@@ -777,11 +798,24 @@ body::before {
       </div>
       <p class="stage-description">A kernel slides over the input image in 3D, computing weighted sums at each position. The result is a feature map that highlights specific patterns.</p>
 
-      <div class="conv-3d-scene">
-        <div class="conv-3d-container" id="conv3dContainer">
-          <div class="conv-layer conv-layer-input" id="conv3dInput"></div>
-          <div class="conv-layer-kernel" id="conv3dKernel"></div>
-          <div class="conv-layer conv-layer-output" id="conv3dOutput"></div>
+      <div class="conv-3d-layout">
+        <!-- Left: 3D input + kernel -->
+        <div class="conv-3d-scene">
+          <div class="conv-3d-container" id="conv3dContainer">
+            <img src="mountain.jpg" alt="" style="position:absolute; width:300px; height:300px; object-fit:cover; border-radius:8px; opacity:0.25; transform:translateZ(-2px);" id="conv3dBgImg">
+            <div class="conv-layer conv-layer-input" id="conv3dInput"></div>
+            <div class="conv-layer-kernel" id="conv3dKernel"></div>
+          </div>
+        </div>
+
+        <!-- Arrow -->
+        <div class="conv-layout-arrow">&#10230;</div>
+
+        <!-- Right: Output feature map -->
+        <div class="conv-output-panel">
+          <div class="conv-output-label">Output Feature Map</div>
+          <div class="conv-output-grid" id="conv3dOutput"></div>
+          <div style="font-size: 11px; color: var(--text-muted); text-align: center; max-width: 300px;">Each cell shows the result of the kernel applied at that position &mdash; highlighting where the pattern was found</div>
         </div>
       </div>
 
@@ -1168,42 +1202,49 @@ body::before {
     grid.appendChild(cell);
   }
 
-  // INPUT VISUAL (Stage 1)
-  var inputVisual = document.getElementById('inputVisual');
-  var inputContainer = document.createElement('div');
-  inputContainer.style.cssText = 'display:grid; grid-template-columns:repeat(8,1fr); gap:3px; padding:16px;';
-  for (var j = 0; j < 64; j++) {
-    var pxCell = document.createElement('div');
-    var val = Math.floor(Math.random() * 256);
-    var r = Math.floor(Math.random() * 100 + 50);
-    var g = Math.floor(Math.random() * 100 + 80);
-    var b = Math.floor(Math.random() * 150 + 100);
-    pxCell.style.cssText = 'width:28px;height:28px;border-radius:3px;background:rgb('+r+','+g+','+b+');display:flex;align-items:center;justify-content:center;font-size:8px;color:rgba(255,255,255,0.7);cursor:pointer;transition:transform 0.2s;';
-    pxCell.textContent = val;
-    pxCell.title = 'R:'+r+' G:'+g+' B:'+b;
-    (function(el) {
-      el.addEventListener('mouseenter', function() { el.style.transform = 'scale(1.3)'; el.style.zIndex = '2'; });
-      el.addEventListener('mouseleave', function() { el.style.transform = 'scale(1)'; el.style.zIndex = '0'; });
-    })(pxCell);
-    inputContainer.appendChild(pxCell);
+  // INPUT VISUAL (Stage 1) — sample real pixels from mountain.jpg
+  var srcImg = document.getElementById('srcImage');
+  function buildPixelSample() {
+    var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext('2d');
+    canvas.width = 6;
+    canvas.height = 6;
+    ctx.drawImage(srcImg, 0, 0, 6, 6);
+    var imgData = ctx.getImageData(0, 0, 6, 6).data;
+    var grid = document.getElementById('pixelSampleGrid');
+    while (grid.firstChild) grid.removeChild(grid.firstChild);
+    for (var i = 0; i < 36; i++) {
+      var px = i * 4;
+      var rv = imgData[px], gv = imgData[px+1], bv = imgData[px+2];
+      var cell = document.createElement('div');
+      cell.style.cssText = 'width:32px;height:32px;border-radius:3px;background:rgb('+rv+','+gv+','+bv+');display:flex;align-items:center;justify-content:center;font-size:7px;color:rgba(255,255,255,0.8);cursor:pointer;transition:transform 0.2s;border:1px solid rgba(255,255,255,0.1);';
+      cell.textContent = rv;
+      cell.title = 'R:'+rv+' G:'+gv+' B:'+bv;
+      (function(el) {
+        el.addEventListener('mouseenter', function() { el.style.transform = 'scale(1.3)'; el.style.zIndex = '2'; });
+        el.addEventListener('mouseleave', function() { el.style.transform = 'scale(1)'; el.style.zIndex = '0'; });
+      })(cell);
+      grid.appendChild(cell);
+    }
   }
-  inputVisual.appendChild(inputContainer);
+  if (srcImg.complete) { buildPixelSample(); }
+  else { srcImg.addEventListener('load', buildPixelSample); }
 
-  // CONVOLUTION DEMO — 3D with mountain landscape image
+  // CONVOLUTION DEMO — 3D with real image sampling
   var GRID_SIZE = 10;
-  // Mountain landscape pixel values (grayscale, resembling the Alps reference image)
-  // Dark sky at top, bright snow peaks in middle, darker forest/lake at bottom
+  // Sampled grayscale values from Torres del Paine landscape
+  // Row 0-2: blue sky, Row 3-5: mountain peaks (bright), Row 6-7: turquoise lake, Row 8-9: dark foreground
   var mountainImage = [
-    [25, 30, 28, 22, 20, 18, 22, 28, 30, 25],
-    [30, 35, 40, 35, 25, 20, 30, 38, 42, 35],
-    [40, 55, 70, 85, 60, 45, 65, 80, 70, 50],
-    [55, 80,120,180,200,190,170,140,100, 65],
-    [70,110,170,220,245,240,230,200,150, 90],
-    [65, 95,140,190,210,205,195,160,120, 80],
-    [50, 70, 90,110,120,115,100, 85, 75, 60],
-    [35, 45, 55, 60, 65, 63, 58, 50, 42, 38],
-    [28, 35, 40, 42, 45, 44, 40, 38, 35, 30],
-    [22, 28, 32, 35, 38, 36, 34, 30, 28, 24]
+    [145,155,165,170,175,180,178,168,160,150],
+    [130,140,155,160,168,175,172,158,145,135],
+    [100,115,130,145,150,148,140,125,110, 95],
+    [120,150,185,210,225,230,220,195,165,130],
+    [110,145,180,215,240,245,235,205,170,125],
+    [105,135,165,195,215,210,200,175,145,115],
+    [ 90,120,155,180,190,195,185,160,130,100],
+    [ 70,100,140,165,175,180,170,150,115, 80],
+    [180,190,200,195,185,180,175,185,195,190],
+    [170,175,185,180,170,165,160,170,180,175]
   ];
 
   var kernels3x3 = {
@@ -1254,25 +1295,34 @@ body::before {
     return output;
   }
 
-  function getPixelColor(val) {
-    // Map grayscale 0-255 to a blue-tinted mountain palette
+  function getPixelColor(val, row) {
+    // Color-code by region to match Torres del Paine landscape
     var t = val / 255;
-    var r = Math.round(20 + t * 180);
-    var g = Math.round(30 + t * 200);
-    var b = Math.round(60 + t * 195);
-    return 'rgb(' + r + ',' + g + ',' + b + ')';
+    if (row <= 2) {
+      // Sky — blue tones
+      return 'rgb(' + Math.round(80 + t*100) + ',' + Math.round(130 + t*80) + ',' + Math.round(180 + t*75) + ')';
+    } else if (row <= 5) {
+      // Mountains — warm grey/white peaks
+      return 'rgb(' + Math.round(60 + t*180) + ',' + Math.round(55 + t*170) + ',' + Math.round(50 + t*160) + ')';
+    } else if (row <= 7) {
+      // Lake — turquoise
+      return 'rgb(' + Math.round(20 + t*80) + ',' + Math.round(100 + t*120) + ',' + Math.round(130 + t*100) + ')';
+    } else {
+      // Foreground — golden yellow flowers
+      return 'rgb(' + Math.round(150 + t*80) + ',' + Math.round(140 + t*60) + ',' + Math.round(30 + t*40) + ')';
+    }
   }
 
   function renderInput3D() {
     var container = document.getElementById('conv3dInput');
     while (container.firstChild) container.removeChild(container.firstChild);
     container.style.gridTemplateColumns = 'repeat(' + GRID_SIZE + ', 1fr)';
-    var cellSize = 320 / GRID_SIZE;
+    var cellSize = 300 / GRID_SIZE;
     for (var r = 0; r < GRID_SIZE; r++) {
       for (var c = 0; c < GRID_SIZE; c++) {
         var cell = document.createElement('div');
         cell.className = 'img-cell';
-        cell.style.background = getPixelColor(mountainImage[r][c]);
+        cell.style.background = getPixelColor(mountainImage[r][c], r);
         cell.style.width = cellSize + 'px';
         cell.style.height = cellSize + 'px';
         cell.dataset.row = r;
@@ -1288,19 +1338,17 @@ body::before {
     while (container.firstChild) container.removeChild(container.firstChild);
     var outSize = getOutputSize();
     container.style.gridTemplateColumns = 'repeat(' + outSize + ', 1fr)';
-    var cellSize = 320 / outSize;
     for (var r = 0; r < outSize; r++) {
       for (var c = 0; c < outSize; c++) {
         var cell = document.createElement('div');
         var isComputed = highlightPos && (r < highlightPos.r || (r === highlightPos.r && c <= highlightPos.c));
-        cell.className = 'output-3d-cell' + (isComputed ? ' computed' : '');
-        cell.style.width = cellSize + 'px';
-        cell.style.height = cellSize + 'px';
+        var isCurrent = highlightPos && (r === highlightPos.r && c === highlightPos.c);
+        cell.className = 'output-3d-cell' + (isComputed ? ' computed' : '') + (isCurrent ? ' current' : '');
         if (isComputed) {
           var absVal = Math.abs(output[r][c]);
-          var maxVal = 600;
+          var maxVal = 500;
           var intensity = Math.min(absVal / maxVal, 1);
-          cell.style.background = 'rgba(6,182,212,' + (0.1 + intensity * 0.6) + ')';
+          cell.style.background = 'rgba(6,182,212,' + (0.08 + intensity * 0.55) + ')';
           cell.textContent = output[r][c];
         }
         container.appendChild(cell);
@@ -1310,7 +1358,7 @@ body::before {
 
   function positionKernel(row, col) {
     var kernelEl = document.getElementById('conv3dKernel');
-    var cellSize = 320 / GRID_SIZE;
+    var cellSize = 300 / GRID_SIZE;
     var kPixelSize = cellSize * kernelSize;
     kernelEl.style.width = kPixelSize + 'px';
     kernelEl.style.height = kPixelSize + 'px';
