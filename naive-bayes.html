@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Naive Bayes — IIITB ML Path</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg-deep:#0a1020;--bg-mid:#0f1628;--bg-light:#1a2a4a;--bg-accent:#1e3a5f;--glass-bg:rgba(255,255,255,0.04);--glass-border:rgba(255,255,255,0.10);--text-primary:#ffffff;--text-secondary:rgba(255,255,255,0.7);--text-muted:rgba(255,255,255,0.45);--accent-blue:#3b82f6;--accent-indigo:#6366f1;--accent-purple:#8b5cf6;--accent-violet:#a78bfa;--accent-cyan:#06b6d4;--accent-teal:#14b8a6;--accent-amber:#f59e0b;--accent-rose:#fb7185;--radius-sm:8px;--radius-md:12px;--radius-lg:16px;--stage-color:#c09cfc}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg-deep);color:var(--text-primary);line-height:1.6;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(59,130,246,0.08) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(139,92,246,0.06) 0%,transparent 50%),linear-gradient(180deg,var(--bg-deep) 0%,var(--bg-mid) 30%,var(--bg-light) 70%,var(--bg-accent) 100%);z-index:-1}
+.section{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;position:relative}
+.section-compact{min-height:auto;padding:60px 40px}
+.glass-card{background:var(--glass-bg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:32px;position:relative;overflow:hidden;transition:border-color 0.3s,transform 0.3s}
+.glass-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent)}
+.stage-badge{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:var(--radius-sm);font-size:14px;font-weight:700;color:white;flex-shrink:0}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity 0.7s ease,transform 0.7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:0.1s}.reveal-delay-2{transition-delay:0.2s}.reveal-delay-3{transition-delay:0.3s}
+.hero{text-align:center}
+.hero-title{font-size:clamp(2.5rem,5vw,4rem);font-weight:800;letter-spacing:-0.02em;margin-bottom:16px;background:linear-gradient(135deg,#fff 0%,rgba(255,255,255,0.8) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-subtitle{font-size:clamp(1rem,2vw,1.25rem);color:var(--text-secondary);margin-bottom:48px}
+.hero-tag{display:inline-block;font-size:0.75rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--stage-color);border:1px solid rgba(192,156,252,0.3);border-radius:999px;padding:6px 16px;margin-bottom:24px}
+.scroll-indicator{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);animation:bounce 2s infinite;color:var(--text-muted);font-size:24px}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(10px)}}
+.stage-container{max-width:900px;width:100%}
+.stage-header{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+.stage-title{font-size:1.75rem;font-weight:700}
+.stage-description{color:var(--text-secondary);font-size:1.05rem;margin-bottom:24px}
+.insight-box{margin-top:24px;padding:16px 20px;background:rgba(192,156,252,0.08);border-left:3px solid var(--stage-color);border-radius:0 var(--radius-sm) var(--radius-sm) 0;color:var(--text-secondary);font-style:italic}
+.takeaways-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1000px;width:100%}
+@media(max-width:768px){.takeaways-grid{grid-template-columns:1fr}}
+.takeaway-card{text-align:center;padding:32px 24px}
+.takeaway-icon{font-size:32px;margin-bottom:16px;display:block}
+.takeaway-card h4{font-size:1rem;margin-bottom:8px}
+.takeaway-card p{font-size:0.9rem;color:var(--text-secondary)}
+.section-title{font-size:clamp(1.75rem,3vw,2.5rem);font-weight:800;text-align:center;margin-bottom:16px}
+.footer{padding:40px;text-align:center;color:var(--text-muted);font-size:0.85rem;border-top:1px solid rgba(255,255,255,0.05)}
+.nav-bar{display:flex;justify-content:space-between;align-items:center;padding:24px 40px;background:rgba(255,255,255,0.02);border-top:1px solid rgba(255,255,255,0.06)}
+.pros-cons{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:600px){.pros-cons{grid-template-columns:1fr}}
+.pros-cons-col h4{font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px;padding:6px 12px;border-radius:var(--radius-sm)}
+.pros-col h4{background:rgba(20,184,166,0.15);color:var(--accent-teal)}
+.cons-col h4{background:rgba(251,113,133,0.15);color:var(--accent-rose)}
+.pros-cons-col ul{list-style:none}
+.pros-cons-col li{padding:5px 0 5px 18px;font-size:0.9rem;color:var(--text-secondary);position:relative}
+.pros-cons-col li::before{content:'\2022';position:absolute;left:0}
+.pros-col li::before{color:var(--accent-teal)}
+.cons-col li::before{color:var(--accent-rose)}
+.use-case-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.use-case-tag{font-size:0.8rem;padding:4px 12px;border-radius:999px;background:rgba(255,255,255,0.06);color:var(--text-secondary);border:1px solid rgba(255,255,255,0.08)}
+@media(max-width:640px){.section{padding:60px 20px}.section-compact{padding:40px 20px}.nav-bar{flex-direction:column;gap:12px;text-align:center}}
+</style>
+</head>
+<body>
+
+<section class="section hero">
+  <div style="margin-bottom:36px;display:flex;flex-direction:column;gap:8px;max-width:320px;width:100%;">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(192,156,252,0.1);border:1px solid rgba(192,156,252,0.2);border-radius:8px;font-size:0.85rem;">
+      <span>P(Spam)</span><span id="pSpam" style="color:var(--stage-color);font-weight:700;">0.30</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:8px;font-size:0.85rem;">
+      <span>P("free" | Spam)</span><span id="pFreeSpam" style="color:var(--accent-indigo);font-weight:700;">0.80</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:8px;font-size:0.85rem;">
+      <span>P("free" | Ham)</span><span id="pFreeHam" style="color:var(--accent-indigo);font-weight:700;">0.10</span>
+    </div>
+    <div style="height:1px;background:rgba(255,255,255,0.08);margin:4px 0;"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:rgba(20,184,166,0.12);border:1px solid rgba(20,184,166,0.3);border-radius:8px;font-size:0.9rem;">
+      <span style="font-weight:700;">P(Spam | "free")</span><span id="posterior" style="color:var(--accent-teal);font-weight:700;">0.774</span>
+    </div>
+  </div>
+  <div class="hero-tag">Topic 10 · Phase 2 · Animated</div>
+  <h1 class="hero-title">Update Your Beliefs</h1>
+  <p class="hero-subtitle">Naive Bayes — probabilistic classification using Bayes' theorem</p>
+  <div class="scroll-indicator">↓</div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--stage-color);">1</div><h2 class="stage-title">The Problem</h2></div>
+    <p class="stage-description">A news aggregator wants to classify articles into categories (politics, sports, tech) based on the words they contain. The feature space is huge (vocabulary = 50,000 words) but most models are too slow.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;">
+      <div>
+        <h4 style="font-size:0.85rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:12px;">The challenge</h4>
+        <ul style="list-style:none;">
+          <li style="padding:6px 0;color:var(--text-secondary);position:relative;padding-left:20px;"><span style="position:absolute;left:0;color:var(--stage-color);">•</span>50,000-dimensional feature space</li>
+          <li style="padding:6px 0;color:var(--text-secondary);position:relative;padding-left:20px;"><span style="position:absolute;left:0;color:var(--stage-color);">•</span>Need instant predictions</li>
+          <li style="padding:6px 0;color:var(--text-secondary);position:relative;padding-left:20px;"><span style="position:absolute;left:0;color:var(--stage-color);">•</span>Limited training data</li>
+        </ul>
+      </div>
+      <div style="background:rgba(192,156,252,0.06);border-radius:var(--radius-md);padding:16px;font-size:0.85rem;">
+        <div style="font-weight:700;margin-bottom:8px;">Why Naive Bayes works here:</div>
+        <div style="color:var(--text-muted);">Assumes word independence — a heroic but useful simplification. Counting word frequencies is O(n) and instant to predict.</div>
+      </div>
+    </div>
+    <div class="insight-box">"The 'naive' part means we ignore correlations between features. The model is wrong in theory but surprisingly right in practice."</div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-indigo);">2</div><h2 class="stage-title">The Intuition</h2></div>
+    <p class="stage-description">Start with a prior belief (base rate of each class). Then update that belief as you observe each word in the document. Each word shifts the probability up or down. After all words, pick the most probable class.</p>
+    <div style="margin-top:16px;padding:20px;background:rgba(255,255,255,0.03);border-radius:var(--radius-md);">
+      <div style="font-weight:700;margin-bottom:12px;color:white;">Live probability update:</div>
+      <div id="bayesViz" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-purple);">3</div><h2 class="stage-title">The Math</h2></div>
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;"><div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Bayes' Theorem</div><code style="color:var(--stage-color);font-size:1rem;">P(C|X) = P(X|C) · P(C) / P(X)</code></div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;"><div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Naive Independence Assumption</div><code style="color:var(--accent-indigo);font-size:1rem;">P(X|C) = Π P(xᵢ|C) &nbsp;(features are conditionally independent)</code></div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;"><div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Decision Rule (log-space for stability)</div><code style="color:var(--accent-cyan);font-size:1rem;">ŷ = argmax_c [ log P(C) + Σᵢ log P(xᵢ|C) ]</code></div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-violet);">4</div><h2 class="stage-title">Assumptions &amp; Pitfalls</h2></div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;"><strong>Independence assumption is almost never true.</strong> <span style="color:var(--text-secondary);">"free money" is correlated — but the model treats them independently. Works anyway because we only need the ranking, not accurate probabilities.</span></div>
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;"><strong>Zero-frequency problem.</strong> <span style="color:var(--text-secondary);">A word never seen in training → P = 0 → collapses entire product. Fix with Laplace (add-1) smoothing.</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-cyan);">5</div><h2 class="stage-title">When to Use</h2></div>
+    <div class="pros-cons">
+      <div class="pros-cons-col pros-col"><h4>Strengths</h4><ul><li>Extremely fast to train and predict</li><li>Works well with small data</li><li>Scales to huge feature spaces</li><li>Handles multiclass naturally</li></ul></div>
+      <div class="pros-cons-col cons-col"><h4>Limitations</h4><ul><li>Independence assumption violated in practice</li><li>Probabilities are poorly calibrated</li><li>Continuous features need distribution assumption</li><li>Outperformed by modern NLP (transformers)</li></ul></div>
+    </div>
+    <div class="use-case-tags">
+      <span class="use-case-tag">Spam filtering</span>
+      <span class="use-case-tag">News classification</span>
+      <span class="use-case-tag">Sentiment analysis</span>
+      <span class="use-case-tag">Real-time text categorisation</span>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <h2 class="section-title reveal">Key Takeaways</h2>
+  <div class="takeaways-grid">
+    <div class="glass-card takeaway-card reveal reveal-delay-1"><span class="takeaway-icon" style="color:var(--stage-color);">🔄</span><h4>Prior × Likelihood → Posterior</h4><p>Bayes' theorem turns base rates and observed evidence into an updated belief. Each word is evidence that shifts the probability.</p></div>
+    <div class="glass-card takeaway-card reveal reveal-delay-2"><span class="takeaway-icon" style="color:var(--accent-indigo);">⚡</span><h4>Surprisingly Effective Despite Being "Naive"</h4><p>The independence assumption is wrong — but for many text tasks, Naive Bayes rivals much more complex models.</p></div>
+    <div class="glass-card takeaway-card reveal reveal-delay-3"><span class="takeaway-icon" style="color:var(--accent-teal);">🧂</span><h4>Always Use Laplace Smoothing</h4><p>Add-1 smoothing prevents zero-probability collapse for unseen words. A tiny constant that makes the model robust.</p></div>
+  </div>
+</section>
+
+<nav class="nav-bar reveal">
+  <a href="svm.html" style="color:var(--text-secondary);text-decoration:none;font-size:0.95rem;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">← SVM</a>
+  <a href="clustering.html" style="color:var(--text-secondary);text-decoration:none;font-size:0.95rem;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">Clustering →</a>
+</nav>
+<footer class="footer">Built for IIITB Deep Learning Course · 2026</footer>
+
+<script>
+(function(){
+  // Hero animated posterior
+  var words = [['free',0.8,0.1],['money',0.7,0.15],['click',0.6,0.2],['dear',0.1,0.4],['meeting',0.05,0.5]];
+  var prior = 0.3;
+  var idx = 0;
+  function updatePosterior() {
+    var w = words[idx % words.length];
+    var pLikSpam = w[1], pLikHam = w[2];
+    var pEvidence = pLikSpam * prior + pLikHam * (1 - prior);
+    var post = (pLikSpam * prior) / pEvidence;
+    document.getElementById('pFreeSpam').textContent = pLikSpam.toFixed(2);
+    document.getElementById('pFreeHam').textContent = pLikHam.toFixed(2);
+    document.getElementById('posterior').textContent = post.toFixed(3);
+    prior = post;
+    idx++;
+    if(idx > 20) { prior = 0.3; idx = 0; }
+  }
+  setInterval(updatePosterior, 1800);
+
+  // Word chip animation
+  var bayesDiv = document.getElementById('bayesViz');
+  var allWords = [['free','#fb7185'],['money','#fb7185'],['winner','#fb7185'],['click','#f97316'],['dear','#14b8a6'],['regards','#14b8a6'],['meeting','#3b82f6'],['project','#3b82f6'],['offer','#f59e0b']];
+  allWords.forEach(function(w, i) {
+    var chip = document.createElement('div');
+    chip.style.cssText = 'padding:4px 10px;border-radius:999px;font-size:0.82rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:'+w[1]+';opacity:0;transition:opacity 0.4s ease '+(i*0.1)+'s;';
+    chip.textContent = w[0];
+    bayesDiv.appendChild(chip);
+    setTimeout(function(el){ el.style.opacity='1'; }(chip), 400 + i*100);
+  });
+
+  var obs = new IntersectionObserver(function(entries){ entries.forEach(function(e){ if(e.isIntersecting) e.target.classList.add('visible'); }); }, {threshold:0.12});
+  document.querySelectorAll('.reveal').forEach(function(el){ obs.observe(el); });
+})();
+</script>
+</body>
+</html>

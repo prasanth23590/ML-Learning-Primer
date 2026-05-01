@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDA & Statistics — IIITB ML Path</title>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg-deep: #0a1020; --bg-mid: #0f1628; --bg-light: #1a2a4a; --bg-accent: #1e3a5f;
+  --glass-bg: rgba(255,255,255,0.04); --glass-border: rgba(255,255,255,0.10);
+  --glass-border-hover: rgba(255,255,255,0.18);
+  --text-primary: #ffffff; --text-secondary: rgba(255,255,255,0.7); --text-muted: rgba(255,255,255,0.45);
+  --accent-blue: #3b82f6; --accent-indigo: #6366f1; --accent-purple: #8b5cf6;
+  --accent-violet: #a78bfa; --accent-cyan: #06b6d4; --accent-teal: #14b8a6;
+  --accent-amber: #f59e0b; --accent-rose: #fb7185;
+  --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --radius-xl: 20px;
+  --stage-color: var(--accent-blue);
+}
+html { scroll-behavior: smooth; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg-deep); color: var(--text-primary); line-height: 1.6; overflow-x: hidden; }
+body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse at 20% 20%, rgba(59,130,246,0.08) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(139,92,246,0.06) 0%, transparent 50%), linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-mid) 30%, var(--bg-light) 70%, var(--bg-accent) 100%); z-index: -1; }
+.section { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 40px; position: relative; }
+.section-compact { min-height: auto; padding: 60px 40px; }
+.glass-card { background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 32px; position: relative; overflow: hidden; transition: border-color 0.3s, transform 0.3s; }
+.glass-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent); }
+.glass-card:hover { border-color: var(--glass-border-hover); transform: translateY(-2px); }
+.stage-badge { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 700; color: white; flex-shrink: 0; }
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-delay-1 { transition-delay: 0.1s; } .reveal-delay-2 { transition-delay: 0.2s; } .reveal-delay-3 { transition-delay: 0.3s; }
+.hero { text-align: center; }
+.hero-title { font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 16px; background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.8) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.hero-subtitle { font-size: clamp(1rem, 2vw, 1.25rem); color: var(--text-secondary); margin-bottom: 48px; }
+.hero-tag { display: inline-block; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--stage-color); border: 1px solid rgba(59,130,246,0.3); border-radius: 999px; padding: 6px 16px; margin-bottom: 24px; }
+.scroll-indicator { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); animation: bounce 2s infinite; color: var(--text-muted); font-size: 24px; }
+@keyframes bounce { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(10px); } }
+.stage-container { max-width: 900px; width: 100%; }
+.stage-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+.stage-title { font-size: 1.75rem; font-weight: 700; }
+.stage-description { color: var(--text-secondary); font-size: 1.05rem; margin-bottom: 24px; }
+.stage-content { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+@media (max-width: 768px) { .stage-content { grid-template-columns: 1fr; } }
+.stage-learns h4 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 12px; }
+.stage-learns ul { list-style: none; padding: 0; }
+.stage-learns li { padding: 6px 0; color: var(--text-secondary); position: relative; padding-left: 20px; }
+.stage-learns li::before { content: '\2022'; position: absolute; left: 0; color: var(--stage-color); }
+.stage-visual { display: flex; align-items: center; justify-content: center; min-height: 200px; background: rgba(255,255,255,0.02); border-radius: var(--radius-md); border: 1px solid rgba(255,255,255,0.06); overflow: hidden; }
+.insight-box { margin-top: 24px; padding: 16px 20px; background: rgba(59,130,246,0.08); border-left: 3px solid var(--stage-color); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; color: var(--text-secondary); font-style: italic; }
+.takeaways-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; max-width: 1000px; width: 100%; }
+@media (max-width: 768px) { .takeaways-grid { grid-template-columns: 1fr; } }
+.takeaway-card { text-align: center; padding: 32px 24px; }
+.takeaway-icon { font-size: 32px; margin-bottom: 16px; display: block; }
+.takeaway-card h4 { font-size: 1rem; margin-bottom: 8px; }
+.takeaway-card p { font-size: 0.9rem; color: var(--text-secondary); }
+.section-title { font-size: clamp(1.75rem, 3vw, 2.5rem); font-weight: 800; text-align: center; margin-bottom: 16px; }
+.section-subtitle { font-size: 1.05rem; color: var(--text-secondary); text-align: center; margin-bottom: 48px; }
+.footer { padding: 40px; text-align: center; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid rgba(255,255,255,0.05); }
+.nav-bar { display: flex; justify-content: space-between; align-items: center; padding: 24px 40px; background: rgba(255,255,255,0.02); border-top: 1px solid rgba(255,255,255,0.06); }
+.nav-link { color: var(--text-secondary); text-decoration: none; font-size: 0.95rem; transition: color 0.2s; padding: 8px 0; }
+.nav-link:hover { color: var(--text-primary); }
+.nav-link.prev::before { content: '← '; }
+.nav-link.next::after { content: ' →'; }
+.pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 600px) { .pros-cons { grid-template-columns: 1fr; } }
+.pros-cons-col h4 { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; padding: 6px 12px; border-radius: var(--radius-sm); }
+.pros-col h4 { background: rgba(20,184,166,0.15); color: var(--accent-teal); }
+.cons-col h4 { background: rgba(251,113,133,0.15); color: var(--accent-rose); }
+.pros-cons-col ul { list-style: none; }
+.pros-cons-col li { padding: 5px 0 5px 18px; font-size: 0.9rem; color: var(--text-secondary); position: relative; }
+.pros-cons-col li::before { content: '\2022'; position: absolute; left: 0; }
+.pros-col li::before { color: var(--accent-teal); }
+.cons-col li::before { color: var(--accent-rose); }
+.use-case-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.use-case-tag { font-size: 0.8rem; padding: 4px 12px; border-radius: 999px; background: rgba(255,255,255,0.06); color: var(--text-secondary); border: 1px solid rgba(255,255,255,0.08); }
+/* Visual animation helpers */
+.bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 120px; padding: 12px; }
+.bar { width: 28px; border-radius: 4px 4px 0 0; animation: growBar 1.5s ease-out forwards; opacity: 0; }
+@keyframes growBar { from { height: 0; opacity: 0; } to { opacity: 1; } }
+.scatter-container { position: relative; width: 220px; height: 160px; }
+.scatter-dot { position: absolute; width: 8px; height: 8px; border-radius: 50%; animation: popIn 0.4s ease forwards; opacity: 0; }
+@keyframes popIn { to { opacity: 0.8; transform: scale(1); } from { opacity: 0; transform: scale(0); } }
+@media (max-width: 640px) { .section { padding: 60px 20px; } .section-compact { padding: 40px 20px; } .nav-bar { flex-direction: column; gap: 12px; } }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="section hero">
+  <div id="heroViz" style="margin-bottom:40px;"></div>
+  <div class="hero-tag">Topic 01 · Phase 1</div>
+  <h1 class="hero-title">What Does the Data Say?</h1>
+  <p class="hero-subtitle">Exploratory Data Analysis &amp; Statistics — before any model, understand your data</p>
+  <div class="scroll-indicator">↓</div>
+</section>
+
+<!-- STAGE 1 -->
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header">
+      <div class="stage-badge" style="background:var(--accent-blue);">1</div>
+      <h2 class="stage-title">The Problem</h2>
+    </div>
+    <p class="stage-description">You've been given a loan dataset. Before predicting defaults, what do you actually know about it? Real-world data is messy — missing values, skewed distributions, hidden correlations.</p>
+    <div class="stage-content">
+      <div class="stage-learns">
+        <h4>What we're trying to solve</h4>
+        <ul>
+          <li>Understand the shape and spread of each feature</li>
+          <li>Detect missing values and outliers</li>
+          <li>Find which features correlate with the target</li>
+          <li>Decide what transformations are needed before modelling</li>
+        </ul>
+      </div>
+      <div class="stage-visual">
+        <div id="scatterViz" class="scatter-container"></div>
+      </div>
+    </div>
+    <div class="insight-box">"All models are wrong, but some are useful — and no model survives bad data." — after Box</div>
+  </div>
+</section>
+
+<!-- STAGE 2 -->
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header">
+      <div class="stage-badge" style="background:var(--accent-indigo);">2</div>
+      <h2 class="stage-title">The Intuition</h2>
+    </div>
+    <p class="stage-description">Think of EDA as a conversation with the data. You ask questions, the data answers with distributions, correlations, and anomalies. A histogram tells you more about a variable than its mean ever could.</p>
+    <div style="padding:24px 0;">
+      <div id="histViz" style="display:flex;align-items:flex-end;gap:5px;height:140px;justify-content:center;"></div>
+      <p style="text-align:center;color:var(--text-muted);font-size:0.85rem;margin-top:12px;">Loan amount distribution — bars animate as data loads</p>
+    </div>
+    <div style="margin-top:20px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;text-align:center;">
+      <div style="padding:16px;background:rgba(59,130,246,0.08);border-radius:var(--radius-md);">
+        <div style="font-size:1.5rem;font-weight:700;color:var(--accent-blue);">μ</div>
+        <div style="font-size:0.85rem;color:var(--text-muted);margin-top:4px;">Mean — central tendency</div>
+      </div>
+      <div style="padding:16px;background:rgba(99,102,241,0.08);border-radius:var(--radius-md);">
+        <div style="font-size:1.5rem;font-weight:700;color:var(--accent-indigo);">σ</div>
+        <div style="font-size:0.85rem;color:var(--text-muted);margin-top:4px;">Std dev — spread</div>
+      </div>
+      <div style="padding:16px;background:rgba(139,92,246,0.08);border-radius:var(--radius-md);">
+        <div style="font-size:1.5rem;font-weight:700;color:var(--accent-purple);">r</div>
+        <div style="font-size:0.85rem;color:var(--text-muted);margin-top:4px;">Correlation — relationship</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STAGE 3 -->
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header">
+      <div class="stage-badge" style="background:var(--accent-purple);">3</div>
+      <h2 class="stage-title">The Math</h2>
+    </div>
+    <p class="stage-description">Three statistical primitives underpin almost everything in EDA:</p>
+    <div style="display:flex;flex-direction:column;gap:20px;margin-top:8px;">
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;">
+        <div style="font-size:0.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Sample Mean &amp; Variance</div>
+        <code style="font-size:1rem;color:var(--accent-blue);">μ = (1/n) Σxᵢ &nbsp;|&nbsp; σ² = (1/n) Σ(xᵢ−μ)²</code>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;">
+        <div style="font-size:0.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Pearson Correlation</div>
+        <code style="font-size:1rem;color:var(--accent-indigo);">r = Σ(xᵢ−x̄)(yᵢ−ȳ) / √[Σ(xᵢ−x̄)²·Σ(yᵢ−ȳ)²]</code>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;">
+        <div style="font-size:0.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Z-score (Standardization)</div>
+        <code style="font-size:1rem;color:var(--accent-purple);">z = (x − μ) / σ</code>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:8px;">Anything beyond |z| &gt; 3 is a likely outlier.</p>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;">
+        <div style="font-size:0.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Hypothesis Testing (t-test)</div>
+        <code style="font-size:1rem;color:var(--accent-cyan);">t = (x̄ − μ₀) / (s/√n) &nbsp;→&nbsp; compare to t-distribution</code>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:8px;">p &lt; 0.05: reject H₀ at 95% confidence.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STAGE 4 -->
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header">
+      <div class="stage-badge" style="background:var(--accent-violet);">4</div>
+      <h2 class="stage-title">Assumptions &amp; Pitfalls</h2>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;">
+        <strong>Correlation ≠ causation.</strong> <span style="color:var(--text-secondary);">Ice cream sales correlate with drowning rates — both driven by summer.</span>
+      </div>
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;">
+        <strong>Simpson's Paradox.</strong> <span style="color:var(--text-secondary);">A trend in combined data reverses when you look at subgroups. Always segment.</span>
+      </div>
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;">
+        <strong>Outlier obsession.</strong> <span style="color:var(--text-secondary);">Don't delete outliers reflexively — they may be the signal, not the noise.</span>
+      </div>
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;">
+        <strong>Missing Not At Random (MNAR).</strong> <span style="color:var(--text-secondary);">If missingness is related to the missing value itself, imputation will mislead you.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STAGE 5 -->
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header">
+      <div class="stage-badge" style="background:var(--accent-cyan);">5</div>
+      <h2 class="stage-title">When to Use</h2>
+    </div>
+    <p class="stage-description">EDA is not optional — it's the first step before any modelling task.</p>
+    <div class="pros-cons" style="margin-top:16px;">
+      <div class="pros-cons-col pros-col">
+        <h4>Strengths</h4>
+        <ul>
+          <li>Catches data quality issues early</li>
+          <li>Reveals unexpected patterns</li>
+          <li>Informs feature engineering</li>
+          <li>No model needed — pure understanding</li>
+        </ul>
+      </div>
+      <div class="pros-cons-col cons-col">
+        <h4>Limitations</h4>
+        <ul>
+          <li>Time-consuming on large datasets</li>
+          <li>Visualizations can mislead if axes are poor</li>
+          <li>Doesn't replace statistical testing</li>
+          <li>Manual process — hard to automate fully</li>
+        </ul>
+      </div>
+    </div>
+    <div class="use-case-tags">
+      <span class="use-case-tag">Finance — loan risk</span>
+      <span class="use-case-tag">Healthcare — clinical data</span>
+      <span class="use-case-tag">E-commerce — customer behaviour</span>
+      <span class="use-case-tag">Any supervised ML pipeline</span>
+    </div>
+  </div>
+</section>
+
+<!-- TAKEAWAYS -->
+<section class="section section-compact">
+  <h2 class="section-title reveal">Key Takeaways</h2>
+  <div class="takeaways-grid">
+    <div class="glass-card takeaway-card reveal reveal-delay-1">
+      <span class="takeaway-icon" style="color:var(--accent-blue);">📊</span>
+      <h4>Look Before You Model</h4>
+      <p>Distributions, missing values, and outliers can invalidate any model if not handled first.</p>
+    </div>
+    <div class="glass-card takeaway-card reveal reveal-delay-2">
+      <span class="takeaway-icon" style="color:var(--accent-indigo);">🔗</span>
+      <h4>Correlation is a Clue</h4>
+      <p>High correlation with the target suggests a useful feature; high correlation between features suggests multicollinearity.</p>
+    </div>
+    <div class="glass-card takeaway-card reveal reveal-delay-3">
+      <span class="takeaway-icon" style="color:var(--accent-cyan);">🧪</span>
+      <h4>Test Your Intuitions</h4>
+      <p>Hypothesis tests turn "this looks different" into "this is statistically different" with a quantified confidence level.</p>
+    </div>
+  </div>
+</section>
+
+<!-- NAV -->
+<nav class="nav-bar reveal">
+  <a href="index.html" class="nav-link prev" style="color:var(--text-muted);">Course Map</a>
+  <a href="linear-regression.html" class="nav-link next">Linear Regression</a>
+</nav>
+
+<footer class="footer">Built for IIITB Deep Learning Course · 2026</footer>
+
+<script>
+(function(){
+  // Hero animated histogram bars
+  var histDiv = document.getElementById('histViz');
+  var heights = [30,45,80,110,130,120,95,70,45,25,15,8];
+  var hues = ['#3b82f6','#4f90f8','#6366f1','#7370f2','#8b5cf6','#9868f8','#a678fa','#b48bfb','#06b6d4','#0dc4d8','#14b8a6','#1ac4b0'];
+  heights.forEach(function(h, i) {
+    var bar = document.createElement('div');
+    bar.style.cssText = 'width:28px;border-radius:4px 4px 0 0;background:'+hues[i]+';height:0;transition:height 0.6s ease '+(i*0.08)+'s;';
+    histDiv.appendChild(bar);
+    setTimeout(function(){ bar.style.height = h + 'px'; }, 400);
+  });
+
+  // Scatter plot
+  var scDiv = document.getElementById('scatterViz');
+  var pts = [{x:30,y:120,c:'#3b82f6'},{x:60,y:80,c:'#6366f1'},{x:90,y:100,c:'#8b5cf6'},{x:120,y:60,c:'#06b6d4'},{x:50,y:130,c:'#3b82f6'},{x:150,y:40,c:'#14b8a6'},{x:170,y:70,c:'#6366f1'},{x:80,y:50,c:'#f59e0b'},{x:140,y:90,c:'#fb7185'},{x:40,y:90,c:'#a78bfa'},{x:180,y:30,c:'#06b6d4'},{x:110,y:140,c:'#fb7185'},{x:160,y:110,c:'#f59e0b'},{x:70,y:150,c:'#8b5cf6'}];
+  pts.forEach(function(p, i) {
+    var dot = document.createElement('div');
+    dot.style.cssText = 'position:absolute;width:8px;height:8px;border-radius:50%;background:'+p.c+';left:'+p.x+'px;top:'+p.y+'px;opacity:0;transform:scale(0);transition:opacity 0.3s ease '+(i*0.05)+'s, transform 0.3s ease '+(i*0.05)+'s;';
+    scDiv.appendChild(dot);
+    setTimeout(function(){ dot.style.opacity = '0.8'; dot.style.transform = 'scale(1)'; }, 300 + i * 50);
+  });
+
+  // Scroll reveal
+  var obs = new IntersectionObserver(function(entries){ entries.forEach(function(e){ if(e.isIntersecting) e.target.classList.add('visible'); }); }, {threshold:0.12, rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.reveal').forEach(function(el){ obs.observe(el); });
+})();
+</script>
+</body>
+</html>

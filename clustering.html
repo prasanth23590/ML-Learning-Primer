@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clustering — IIITB ML Path</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg-deep:#0a1020;--bg-mid:#0f1628;--bg-light:#1a2a4a;--bg-accent:#1e3a5f;--glass-bg:rgba(255,255,255,0.04);--glass-border:rgba(255,255,255,0.10);--text-primary:#ffffff;--text-secondary:rgba(255,255,255,0.7);--text-muted:rgba(255,255,255,0.45);--accent-blue:#3b82f6;--accent-indigo:#6366f1;--accent-purple:#8b5cf6;--accent-violet:#a78bfa;--accent-cyan:#06b6d4;--accent-teal:#14b8a6;--accent-amber:#f59e0b;--accent-rose:#fb7185;--radius-sm:8px;--radius-md:12px;--radius-lg:16px;--stage-color:#06b6d4}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg-deep);color:var(--text-primary);line-height:1.6;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(59,130,246,0.08) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(139,92,246,0.06) 0%,transparent 50%),linear-gradient(180deg,var(--bg-deep) 0%,var(--bg-mid) 30%,var(--bg-light) 70%,var(--bg-accent) 100%);z-index:-1}
+.section{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;position:relative}
+.section-compact{min-height:auto;padding:60px 40px}
+.glass-card{background:var(--glass-bg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:32px;position:relative;overflow:hidden;transition:border-color 0.3s,transform 0.3s}
+.glass-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent)}
+.stage-badge{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:var(--radius-sm);font-size:14px;font-weight:700;color:white;flex-shrink:0}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity 0.7s ease,transform 0.7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:0.1s}.reveal-delay-2{transition-delay:0.2s}.reveal-delay-3{transition-delay:0.3s}
+.hero{text-align:center}
+.hero-title{font-size:clamp(2.5rem,5vw,4rem);font-weight:800;letter-spacing:-0.02em;margin-bottom:16px;background:linear-gradient(135deg,#fff 0%,rgba(255,255,255,0.8) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-subtitle{font-size:clamp(1rem,2vw,1.25rem);color:var(--text-secondary);margin-bottom:48px}
+.hero-tag{display:inline-block;font-size:0.75rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--stage-color);border:1px solid rgba(6,182,212,0.3);border-radius:999px;padding:6px 16px;margin-bottom:24px}
+.scroll-indicator{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);animation:bounce 2s infinite;color:var(--text-muted);font-size:24px}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(10px)}}
+.stage-container{max-width:900px;width:100%}
+.stage-header{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+.stage-title{font-size:1.75rem;font-weight:700}
+.stage-description{color:var(--text-secondary);font-size:1.05rem;margin-bottom:24px}
+.insight-box{margin-top:24px;padding:16px 20px;background:rgba(6,182,212,0.08);border-left:3px solid var(--stage-color);border-radius:0 var(--radius-sm) var(--radius-sm) 0;color:var(--text-secondary);font-style:italic}
+.takeaways-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1000px;width:100%}
+@media(max-width:768px){.takeaways-grid{grid-template-columns:1fr}}
+.takeaway-card{text-align:center;padding:32px 24px}
+.takeaway-icon{font-size:32px;margin-bottom:16px;display:block}
+.takeaway-card h4{font-size:1rem;margin-bottom:8px}
+.takeaway-card p{font-size:0.9rem;color:var(--text-secondary)}
+.section-title{font-size:clamp(1.75rem,3vw,2.5rem);font-weight:800;text-align:center;margin-bottom:16px}
+.footer{padding:40px;text-align:center;color:var(--text-muted);font-size:0.85rem;border-top:1px solid rgba(255,255,255,0.05)}
+.nav-bar{display:flex;justify-content:space-between;align-items:center;padding:24px 40px;background:rgba(255,255,255,0.02);border-top:1px solid rgba(255,255,255,0.06)}
+.pros-cons{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:600px){.pros-cons{grid-template-columns:1fr}}
+.pros-cons-col h4{font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px;padding:6px 12px;border-radius:var(--radius-sm)}
+.pros-col h4{background:rgba(20,184,166,0.15);color:var(--accent-teal)}
+.cons-col h4{background:rgba(251,113,133,0.15);color:var(--accent-rose)}
+.pros-cons-col ul{list-style:none}
+.pros-cons-col li{padding:5px 0 5px 18px;font-size:0.9rem;color:var(--text-secondary);position:relative}
+.pros-cons-col li::before{content:'\2022';position:absolute;left:0}
+.pros-col li::before{color:var(--accent-teal)}
+.cons-col li::before{color:var(--accent-rose)}
+.use-case-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.use-case-tag{font-size:0.8rem;padding:4px 12px;border-radius:999px;background:rgba(255,255,255,0.06);color:var(--text-secondary);border:1px solid rgba(255,255,255,0.08)}
+@media(max-width:640px){.section{padding:60px 20px}.section-compact{padding:40px 20px}.nav-bar{flex-direction:column;gap:12px;text-align:center}}
+</style>
+</head>
+<body>
+
+<section class="section hero">
+  <canvas id="clusterHero" width="300" height="200" style="margin-bottom:36px;border-radius:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);max-width:100%;"></canvas>
+  <div class="hero-tag">Topic 11 · Phase 3 · Interactive</div>
+  <h1 class="hero-title">Find the Natural Groups</h1>
+  <p class="hero-subtitle">Clustering — unsupervised discovery of structure in unlabelled data</p>
+  <div class="scroll-indicator">↓</div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--stage-color);">1</div><h2 class="stage-title">The Problem</h2></div>
+    <p class="stage-description">An e-commerce company has 1 million customers but no labels. Can we find natural groups of similar customers — high-value loyal buyers, one-time discount hunters — without anyone telling us the groups exist?</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;">
+      <div>
+        <h4 style="font-size:0.85rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:12px;">Unsupervised challenge</h4>
+        <ul style="list-style:none;">
+          <li style="padding:6px 0;color:var(--text-secondary);position:relative;padding-left:20px;"><span style="position:absolute;left:0;color:var(--stage-color);">•</span>No labels — only features</li>
+          <li style="padding:6px 0;color:var(--text-secondary);position:relative;padding-left:20px;"><span style="position:absolute;left:0;color:var(--stage-color);">•</span>Unknown number of groups</li>
+          <li style="padding:6px 0;color:var(--text-secondary);position:relative;padding-left:20px;"><span style="position:absolute;left:0;color:var(--stage-color);">•</span>No "correct" answer to evaluate against</li>
+        </ul>
+      </div>
+      <div style="background:rgba(6,182,212,0.06);border-radius:var(--radius-md);padding:16px;font-size:0.85rem;color:var(--text-muted);">Use RFM features: Recency, Frequency, Monetary value — classic clustering features for retail segmentation.</div>
+    </div>
+    <div class="insight-box">"Clustering reveals the hidden architecture of your data — groups that didn't have names until the algorithm found them."</div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-indigo);">2</div><h2 class="stage-title">The Intuition</h2></div>
+    <p class="stage-description">K-Means: place K centroids randomly, assign each point to nearest centroid, move each centroid to the mean of its points. Repeat until nothing moves. Simple, fast, effective.</p>
+    <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.03);border-radius:var(--radius-sm);">
+        <div style="width:28px;height:28px;border-radius:50%;background:rgba(6,182,212,0.3);display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;flex-shrink:0;">1</div>
+        <div style="font-size:0.9rem;color:var(--text-secondary);">Place K centroids at random positions</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.03);border-radius:var(--radius-sm);">
+        <div style="width:28px;height:28px;border-radius:50%;background:rgba(6,182,212,0.4);display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;flex-shrink:0;">2</div>
+        <div style="font-size:0.9rem;color:var(--text-secondary);">Assign each point to nearest centroid (Euclidean distance)</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.03);border-radius:var(--radius-sm);">
+        <div style="width:28px;height:28px;border-radius:50%;background:rgba(6,182,212,0.6);display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;flex-shrink:0;">3</div>
+        <div style="font-size:0.9rem;color:var(--text-secondary);">Move each centroid to the mean of its assigned points</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.03);border-radius:var(--radius-sm);">
+        <div style="width:28px;height:28px;border-radius:50%;background:rgba(20,184,166,0.6);display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;flex-shrink:0;">✓</div>
+        <div style="font-size:0.9rem;color:var(--text-secondary);">Repeat 2–3 until centroids stop moving (convergence)</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-purple);">3</div><h2 class="stage-title">The Math</h2></div>
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;"><div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">K-Means Objective (minimise within-cluster variance)</div><code style="color:var(--stage-color);font-size:1rem;">J = Σₖ Σₓ∈Cₖ ‖x − μₖ‖²</code></div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;"><div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Silhouette Score (−1 to +1)</div><code style="color:var(--accent-indigo);font-size:1rem;">s = (b − a) / max(a, b)</code><p style="color:var(--text-muted);font-size:0.85rem;margin-top:6px;">a = mean intra-cluster distance, b = mean nearest-cluster distance</p></div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;"><div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Elbow Method for K</div><p style="color:var(--text-secondary);font-size:0.9rem;">Plot inertia (J) vs K. The "elbow" — where the curve bends — is the optimal K.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-violet);">4</div><h2 class="stage-title">Assumptions &amp; Pitfalls</h2></div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;"><strong>K-Means assumes spherical clusters of equal size.</strong> <span style="color:var(--text-secondary);">Works badly on elongated or non-convex clusters. Use DBSCAN or GMM instead.</span></div>
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;"><strong>Sensitive to initialisation.</strong> <span style="color:var(--text-secondary);">Always use K-Means++ initialisation — it places centroids far apart initially, reducing bad local optima.</span></div>
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;"><strong>Scale your features.</strong> <span style="color:var(--text-secondary);">K-Means uses Euclidean distance. A feature measured in thousands will dominate. Always standardise first.</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-teal);">5</div><h2 class="stage-title">When to Use</h2></div>
+    <div class="pros-cons">
+      <div class="pros-cons-col pros-col"><h4>Strengths</h4><ul><li>Fast and scalable (O(nkd) per iteration)</li><li>Simple and interpretable</li><li>Works well with compact spherical clusters</li><li>Good starting point for exploration</li></ul></div>
+      <div class="pros-cons-col cons-col"><h4>Limitations</h4><ul><li>Must specify K in advance</li><li>Assumes spherical clusters</li><li>Sensitive to outliers (they shift centroids)</li><li>Non-deterministic without fixed seed</li></ul></div>
+    </div>
+    <div class="use-case-tags">
+      <span class="use-case-tag">Customer segmentation</span>
+      <span class="use-case-tag">Document clustering</span>
+      <span class="use-case-tag">Image compression</span>
+      <span class="use-case-tag">Anomaly detection (pre-step)</span>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <h2 class="section-title reveal">Key Takeaways</h2>
+  <div class="takeaways-grid">
+    <div class="glass-card takeaway-card reveal reveal-delay-1"><span class="takeaway-icon" style="color:var(--stage-color);">🔵</span><h4>Assign, Then Update</h4><p>K-Means alternates between two simple steps until convergence. Each step provably decreases the objective — convergence is guaranteed.</p></div>
+    <div class="glass-card takeaway-card reveal reveal-delay-2"><span class="takeaway-icon" style="color:var(--accent-indigo);">📏</span><h4>Use Silhouette to Validate K</h4><p>Silhouette score near +1 means well-separated clusters. Plot it vs K alongside the elbow curve before deciding.</p></div>
+    <div class="glass-card takeaway-card reveal reveal-delay-3"><span class="takeaway-icon" style="color:var(--accent-teal);">🌌</span><h4>DBSCAN for Arbitrary Shapes</h4><p>When clusters aren't spherical, DBSCAN finds density-based clusters and labels outliers — no K needed.</p></div>
+  </div>
+</section>
+
+<nav class="nav-bar reveal">
+  <a href="naive-bayes.html" style="color:var(--text-secondary);text-decoration:none;font-size:0.95rem;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">← Naive Bayes</a>
+  <a href="pca.html" style="color:var(--text-secondary);text-decoration:none;font-size:0.95rem;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">PCA →</a>
+</nav>
+<footer class="footer">Built for IIITB Deep Learning Course · 2026</footer>
+
+<script>
+(function(){
+  var c = document.getElementById('clusterHero');
+  var ctx = c.getContext('2d');
+  var W = c.width, H = c.height;
+  var clusterData = [
+    {pts:[[50,50],[70,60],[55,80],[80,45],[65,70],[45,65]], cx:61, cy:62, color:'#06b6d4'},
+    {pts:[[180,60],[200,70],[195,45],[210,60],[185,80],[220,50]], cx:198, cy:61, color:'#8b5cf6'},
+    {pts:[[120,150],[140,165],[110,170],[130,180],[150,155],[135,145]], cx:131, cy:161, color:'#14b8a6'}
+  ];
+  var step = 0;
+  var maxStep = 3;
+  function drawStep(s) {
+    ctx.clearRect(0,0,W,H);
+    clusterData.forEach(function(cl, ci) {
+      var color = s >= 1 ? cl.color : 'rgba(255,255,255,0.4)';
+      cl.pts.forEach(function(p){
+        ctx.beginPath(); ctx.arc(p[0], p[1], 5, 0, Math.PI*2);
+        ctx.fillStyle = color; ctx.fill();
+      });
+      if(s >= 1) {
+        var alpha = Math.min(1, (s-1)*0.5 + 0.2);
+        ctx.beginPath();
+        ctx.arc(cl.cx, cl.cy, 10, 0, Math.PI*2);
+        ctx.fillStyle = cl.color; ctx.fill();
+        ctx.strokeStyle = 'white'; ctx.lineWidth = 2; ctx.stroke();
+      }
+    });
+    ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.font = '11px system-ui';
+    var labels = ['Random scatter', 'K=3 assigned', 'Centroids updated', 'Converged'];
+    ctx.fillText(labels[s] || 'Converged', 8, H-8);
+  }
+  drawStep(0);
+  setInterval(function(){ step = (step+1) % (maxStep+1); drawStep(step); }, 1400);
+  var obs = new IntersectionObserver(function(entries){ entries.forEach(function(e){ if(e.isIntersecting) e.target.classList.add('visible'); }); }, {threshold:0.12});
+  document.querySelectorAll('.reveal').forEach(function(el){ obs.observe(el); });
+})();
+</script>
+</body>
+</html>

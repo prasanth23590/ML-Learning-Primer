@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Decision Trees — IIITB ML Path</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg-deep:#0a1020;--bg-mid:#0f1628;--bg-light:#1a2a4a;--bg-accent:#1e3a5f;--glass-bg:rgba(255,255,255,0.04);--glass-border:rgba(255,255,255,0.10);--text-primary:#ffffff;--text-secondary:rgba(255,255,255,0.7);--text-muted:rgba(255,255,255,0.45);--accent-blue:#3b82f6;--accent-indigo:#6366f1;--accent-purple:#8b5cf6;--accent-violet:#a78bfa;--accent-cyan:#06b6d4;--accent-teal:#14b8a6;--accent-amber:#f59e0b;--accent-rose:#fb7185;--radius-sm:8px;--radius-md:12px;--radius-lg:16px;--stage-color:#8b5cf6}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg-deep);color:var(--text-primary);line-height:1.6;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(59,130,246,0.08) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(139,92,246,0.06) 0%,transparent 50%),linear-gradient(180deg,var(--bg-deep) 0%,var(--bg-mid) 30%,var(--bg-light) 70%,var(--bg-accent) 100%);z-index:-1}
+.section{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;position:relative}
+.section-compact{min-height:auto;padding:60px 40px}
+.glass-card{background:var(--glass-bg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:32px;position:relative;overflow:hidden;transition:border-color 0.3s,transform 0.3s}
+.glass-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent)}
+.stage-badge{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:var(--radius-sm);font-size:14px;font-weight:700;color:white;flex-shrink:0}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity 0.7s ease,transform 0.7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:0.1s}.reveal-delay-2{transition-delay:0.2s}.reveal-delay-3{transition-delay:0.3s}
+.hero{text-align:center}
+.hero-title{font-size:clamp(2.5rem,5vw,4rem);font-weight:800;letter-spacing:-0.02em;margin-bottom:16px;background:linear-gradient(135deg,#fff 0%,rgba(255,255,255,0.8) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-subtitle{font-size:clamp(1rem,2vw,1.25rem);color:var(--text-secondary);margin-bottom:48px}
+.hero-tag{display:inline-block;font-size:0.75rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--stage-color);border:1px solid rgba(139,92,246,0.3);border-radius:999px;padding:6px 16px;margin-bottom:24px}
+.scroll-indicator{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);animation:bounce 2s infinite;color:var(--text-muted);font-size:24px}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(10px)}}
+.stage-container{max-width:900px;width:100%}
+.stage-header{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+.stage-title{font-size:1.75rem;font-weight:700}
+.stage-description{color:var(--text-secondary);font-size:1.05rem;margin-bottom:24px}
+.insight-box{margin-top:24px;padding:16px 20px;background:rgba(139,92,246,0.08);border-left:3px solid var(--stage-color);border-radius:0 var(--radius-sm) var(--radius-sm) 0;color:var(--text-secondary);font-style:italic}
+.takeaways-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1000px;width:100%}
+@media(max-width:768px){.takeaways-grid{grid-template-columns:1fr}}
+.takeaway-card{text-align:center;padding:32px 24px}
+.takeaway-icon{font-size:32px;margin-bottom:16px;display:block}
+.takeaway-card h4{font-size:1rem;margin-bottom:8px}
+.takeaway-card p{font-size:0.9rem;color:var(--text-secondary)}
+.section-title{font-size:clamp(1.75rem,3vw,2.5rem);font-weight:800;text-align:center;margin-bottom:16px}
+.footer{padding:40px;text-align:center;color:var(--text-muted);font-size:0.85rem;border-top:1px solid rgba(255,255,255,0.05)}
+.nav-bar{display:flex;justify-content:space-between;align-items:center;padding:24px 40px;background:rgba(255,255,255,0.02);border-top:1px solid rgba(255,255,255,0.06)}
+.pros-cons{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:600px){.pros-cons{grid-template-columns:1fr}}
+.pros-cons-col h4{font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px;padding:6px 12px;border-radius:var(--radius-sm)}
+.pros-col h4{background:rgba(20,184,166,0.15);color:var(--accent-teal)}
+.cons-col h4{background:rgba(251,113,133,0.15);color:var(--accent-rose)}
+.pros-cons-col ul{list-style:none}
+.pros-cons-col li{padding:5px 0 5px 18px;font-size:0.9rem;color:var(--text-secondary);position:relative}
+.pros-cons-col li::before{content:'\2022';position:absolute;left:0}
+.pros-col li::before{color:var(--accent-teal)}
+.cons-col li::before{color:var(--accent-rose)}
+.use-case-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.use-case-tag{font-size:0.8rem;padding:4px 12px;border-radius:999px;background:rgba(255,255,255,0.06);color:var(--text-secondary);border:1px solid rgba(255,255,255,0.08)}
+.demo-btn{padding:10px 24px;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:600;border:1px solid;}
+.demo-btn-yes{background:rgba(20,184,166,0.15);border-color:rgba(20,184,166,0.4);color:#14b8a6}
+.demo-btn-no{background:rgba(251,113,133,0.15);border-color:rgba(251,113,133,0.4);color:#fb7185}
+.demo-btn-reset{padding:8px 20px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:var(--radius-sm);color:var(--text-secondary);cursor:pointer;font-size:0.85rem}
+@media(max-width:640px){.section{padding:60px 20px}.section-compact{padding:40px 20px}.nav-bar{flex-direction:column;gap:12px;text-align:center}}
+</style>
+</head>
+<body>
+
+<section class="section hero">
+  <svg width="260" height="180" viewBox="0 0 260 180" style="margin-bottom:36px;">
+    <line x1="130" y1="20" x2="70" y2="70" stroke="rgba(139,92,246,0.5)" stroke-width="2"/>
+    <line x1="130" y1="20" x2="190" y2="70" stroke="rgba(139,92,246,0.5)" stroke-width="2"/>
+    <line x1="70" y1="70" x2="40" y2="130" stroke="rgba(139,92,246,0.4)" stroke-width="1.5"/>
+    <line x1="70" y1="70" x2="100" y2="130" stroke="rgba(139,92,246,0.4)" stroke-width="1.5"/>
+    <line x1="190" y1="70" x2="160" y2="130" stroke="rgba(139,92,246,0.4)" stroke-width="1.5"/>
+    <line x1="190" y1="70" x2="220" y2="130" stroke="rgba(139,92,246,0.4)" stroke-width="1.5"/>
+    <rect x="105" y="8" width="50" height="24" rx="6" fill="rgba(139,92,246,0.3)" stroke="rgba(139,92,246,0.5)" stroke-width="1.5"/>
+    <text x="130" y="24" text-anchor="middle" fill="white" font-size="9">Age ≤ 35?</text>
+    <rect x="45" y="58" width="50" height="24" rx="6" fill="rgba(99,102,241,0.25)" stroke="rgba(99,102,241,0.4)" stroke-width="1.5"/>
+    <text x="70" y="74" text-anchor="middle" fill="white" font-size="9">Income≤50k?</text>
+    <rect x="165" y="58" width="50" height="24" rx="6" fill="rgba(99,102,241,0.25)" stroke="rgba(99,102,241,0.4)" stroke-width="1.5"/>
+    <text x="190" y="74" text-anchor="middle" fill="white" font-size="9">Usage≤10?</text>
+    <rect x="20" y="118" width="40" height="22" rx="5" fill="rgba(20,184,166,0.2)" stroke="rgba(20,184,166,0.4)" stroke-width="1.5"/>
+    <text x="40" y="133" text-anchor="middle" fill="#14b8a6" font-size="9">Stay ✓</text>
+    <rect x="75" y="118" width="40" height="22" rx="5" fill="rgba(251,113,133,0.2)" stroke="rgba(251,113,133,0.4)" stroke-width="1.5"/>
+    <text x="95" y="133" text-anchor="middle" fill="#fb7185" font-size="9">Churn ✗</text>
+    <rect x="140" y="118" width="40" height="22" rx="5" fill="rgba(251,113,133,0.2)" stroke="rgba(251,113,133,0.4)" stroke-width="1.5"/>
+    <text x="160" y="133" text-anchor="middle" fill="#fb7185" font-size="9">Churn ✗</text>
+    <rect x="200" y="118" width="40" height="22" rx="5" fill="rgba(20,184,166,0.2)" stroke="rgba(20,184,166,0.4)" stroke-width="1.5"/>
+    <text x="220" y="133" text-anchor="middle" fill="#14b8a6" font-size="9">Stay ✓</text>
+  </svg>
+  <div class="hero-tag">Topic 06 · Phase 2 · Interactive</div>
+  <h1 class="hero-title">Twenty Questions for Data</h1>
+  <p class="hero-subtitle">Decision Trees — recursive splitting that mirrors human decision-making</p>
+  <div class="scroll-indicator">↓</div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header">
+      <div class="stage-badge" style="background:var(--stage-color);">1</div>
+      <h2 class="stage-title">The Problem</h2>
+    </div>
+    <p class="stage-description">A hospital wants to predict heart disease risk from patient data (age, chest pain, cholesterol). Doctors need an explainable model — not a black box. Decision trees produce human-readable rules.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;">
+      <div>
+        <h4 style="font-size:0.85rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:12px;">What we need</h4>
+        <ul style="list-style:none;">
+          <li style="padding:6px 0;color:var(--text-secondary);position:relative;padding-left:20px;"><span style="position:absolute;left:0;color:var(--stage-color);">•</span>Classify patients into risk categories</li>
+          <li style="padding:6px 0;color:var(--text-secondary);position:relative;padding-left:20px;"><span style="position:absolute;left:0;color:var(--stage-color);">•</span>Handle numerical and categorical features</li>
+          <li style="padding:6px 0;color:var(--text-secondary);position:relative;padding-left:20px;"><span style="position:absolute;left:0;color:var(--stage-color);">•</span>Produce rules a doctor can explain</li>
+          <li style="padding:6px 0;color:var(--text-secondary);position:relative;padding-left:20px;"><span style="position:absolute;left:0;color:var(--stage-color);">•</span>No feature scaling required</li>
+        </ul>
+      </div>
+      <div style="background:rgba(139,92,246,0.06);border-radius:var(--radius-md);padding:16px;font-size:0.85rem;color:var(--text-secondary);">
+        <div style="margin-bottom:8px;color:white;font-weight:600;">Typical rule generated:</div>
+        <pre style="padding:8px;background:rgba(255,255,255,0.04);border-radius:6px;font-size:0.8rem;white-space:pre-wrap;">if age &gt; 55 AND
+chest_pain = typical AND
+chol &gt; 240:
+  → HIGH RISK</pre>
+      </div>
+    </div>
+    <div class="insight-box">"A decision tree is essentially the game of 20 Questions played with features."</div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-indigo);">2</div><h2 class="stage-title">The Intuition</h2></div>
+    <p class="stage-description">At each node, the tree asks: "Which feature and threshold, if I split on it right now, creates the purest possible child groups?" It greedily picks the best split, then recurses on each child.</p>
+    <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:16px;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:8px;">🎲</div>
+        <div style="font-weight:700;font-size:0.9rem;margin-bottom:4px;">Impure Node</div>
+        <div style="font-size:0.82rem;color:var(--text-muted);">Mixed classes — hard to make a decision</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:16px;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:8px;">✅</div>
+        <div style="font-weight:700;font-size:0.9rem;margin-bottom:4px;">Pure Leaf</div>
+        <div style="font-size:0.82rem;color:var(--text-muted);">All examples of one class — decision made</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Interactive Demo -->
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal" style="max-width:700px;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+      <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#f59e0b,#fb7185);display:flex;align-items:center;justify-content:center;font-size:16px;">⚡</div>
+      <h2 style="font-size:1.5rem;font-weight:700;">Interactive Demo — Classify a Patient</h2>
+    </div>
+    <p style="color:var(--text-secondary);margin-bottom:20px;font-size:0.9rem;">Answer each question to traverse the decision tree.</p>
+    <div id="treeQ" style="font-size:1.1rem;font-weight:600;text-align:center;padding:16px;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);border-radius:var(--radius-md);width:100%;margin-bottom:16px;"></div>
+    <div id="treeBtns" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:12px;"></div>
+    <div id="treePath" style="font-size:0.82rem;color:var(--text-muted);text-align:center;min-height:24px;margin-bottom:12px;"></div>
+    <div style="text-align:center;">
+      <button id="resetBtn" class="demo-btn-reset">Reset</button>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-purple);">3</div><h2 class="stage-title">The Math</h2></div>
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;">
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Gini Impurity</div>
+        <code style="color:var(--accent-purple);font-size:1rem;">Gini = 1 − Σ pᵢ²</code>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:6px;">0 = perfectly pure, 0.5 = maximally impure (2 classes)</p>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;">
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Information Gain (Entropy)</div>
+        <code style="color:var(--accent-indigo);font-size:1rem;">IG = H(parent) − Σ (|child|/|parent|) · H(child)</code>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;">
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Split Selection</div>
+        <p style="color:var(--text-secondary);font-size:0.9rem;">At each node, try all features and all thresholds. Pick the split that maximises Information Gain or minimises Gini. Greedy — no backtracking.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-violet);">4</div><h2 class="stage-title">Assumptions &amp; Pitfalls</h2></div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;"><strong>Overfitting.</strong> <span style="color:var(--text-secondary);">Deep trees memorise training data. Control with max_depth, min_samples_leaf, and pruning.</span></div>
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;"><strong>Greedy splits are locally optimal.</strong> <span style="color:var(--text-secondary);">A split that looks bad now might enable better splits later. Trees can miss global optima.</span></div>
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;"><strong>Unstable to small changes.</strong> <span style="color:var(--text-secondary);">Slight data changes can yield very different trees. Random Forest solves this.</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-cyan);">5</div><h2 class="stage-title">When to Use</h2></div>
+    <div class="pros-cons">
+      <div class="pros-cons-col pros-col"><h4>Strengths</h4><ul><li>Fully interpretable — generates rules</li><li>No feature scaling needed</li><li>Handles mixed data types</li><li>Captures non-linear boundaries</li></ul></div>
+      <div class="pros-cons-col cons-col"><h4>Limitations</h4><ul><li>Overfits easily without pruning</li><li>High variance — small data changes → big tree changes</li><li>Not great for regression (step function output)</li><li>Biased towards high-cardinality features</li></ul></div>
+    </div>
+    <div class="use-case-tags">
+      <span class="use-case-tag">Medical diagnosis rules</span>
+      <span class="use-case-tag">Credit scoring</span>
+      <span class="use-case-tag">Fraud rules</span>
+      <span class="use-case-tag">Base learner for ensembles</span>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <h2 class="section-title reveal">Key Takeaways</h2>
+  <div class="takeaways-grid">
+    <div class="glass-card takeaway-card reveal reveal-delay-1">
+      <span class="takeaway-icon" style="color:var(--stage-color);">🌳</span>
+      <h4>Splits by Purity</h4>
+      <p>Every split is chosen to maximise information gain or minimise Gini impurity — a measure of how mixed the classes are.</p>
+    </div>
+    <div class="glass-card takeaway-card reveal reveal-delay-2">
+      <span class="takeaway-icon" style="color:var(--accent-amber);">✂️</span>
+      <h4>Prune to Generalise</h4>
+      <p>max_depth and min_samples_leaf are the most important hyperparameters. Start shallow and add depth only if validation improves.</p>
+    </div>
+    <div class="glass-card takeaway-card reveal reveal-delay-3">
+      <span class="takeaway-icon" style="color:var(--accent-cyan);">🧱</span>
+      <h4>Building Block of Ensembles</h4>
+      <p>A single tree is weak but interpretable. Combine 100 trees in Random Forest or Boosting for state-of-the-art accuracy.</p>
+    </div>
+  </div>
+</section>
+
+<nav class="nav-bar reveal">
+  <a href="advanced-regression.html" style="color:var(--text-secondary);text-decoration:none;font-size:0.95rem;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">← Advanced Regression</a>
+  <a href="random-forest.html" style="color:var(--text-secondary);text-decoration:none;font-size:0.95rem;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">Random Forest →</a>
+</nav>
+<footer class="footer">Built for IIITB Deep Learning Course · 2026</footer>
+
+<script>
+(function(){
+  var tree = {
+    q: 'Is the patient older than 55?',
+    yes: {
+      q: 'Is chest pain "typical angina"?',
+      yes: { leaf: true, label: 'HIGH RISK', emoji: '🔴', color: '#fb7185', path: 'Age > 55 → Chest pain = typical' },
+      no: {
+        q: 'Is cholesterol > 240 mg/dL?',
+        yes: { leaf: true, label: 'HIGH RISK', emoji: '🔴', color: '#fb7185', path: 'Age > 55 → No typical pain → Chol > 240' },
+        no: { leaf: true, label: 'MEDIUM RISK', emoji: '🟡', color: '#f59e0b', path: 'Age > 55 → No typical pain → Chol ≤ 240' }
+      }
+    },
+    no: {
+      q: 'Is resting heart rate > 130 bpm?',
+      yes: { leaf: true, label: 'MEDIUM RISK', emoji: '🟡', color: '#f59e0b', path: 'Age ≤ 55 → HR > 130' },
+      no: { leaf: true, label: 'LOW RISK', emoji: '🟢', color: '#14b8a6', path: 'Age ≤ 55 → HR ≤ 130' }
+    }
+  };
+
+  var path = [];
+  var cur = tree;
+  var qEl = document.getElementById('treeQ');
+  var btnsEl = document.getElementById('treeBtns');
+  var pathEl = document.getElementById('treePath');
+
+  function makeBtn(label, cls, handler) {
+    var b = document.createElement('button');
+    b.textContent = label;
+    b.className = 'demo-btn ' + cls;
+    b.addEventListener('click', handler);
+    return b;
+  }
+
+  function render() {
+    while (btnsEl.firstChild) btnsEl.removeChild(btnsEl.firstChild);
+    if (cur.leaf) {
+      qEl.style.color = cur.color;
+      qEl.textContent = cur.emoji + ' ' + cur.label;
+      pathEl.textContent = 'Path: ' + cur.path;
+    } else {
+      qEl.style.color = 'white';
+      qEl.textContent = cur.q;
+      btnsEl.appendChild(makeBtn('Yes', 'demo-btn-yes', function(){ path.push('Yes'); cur = cur.yes; render(); }));
+      btnsEl.appendChild(makeBtn('No', 'demo-btn-no', function(){ path.push('No'); cur = cur.no; render(); }));
+      pathEl.textContent = path.length ? 'Path so far: ' + path.join(' → ') : '';
+    }
+  }
+
+  document.getElementById('resetBtn').addEventListener('click', function(){ cur = tree; path = []; render(); });
+  render();
+
+  var obs = new IntersectionObserver(function(entries){ entries.forEach(function(e){ if(e.isIntersecting) e.target.classList.add('visible'); }); }, {threshold:0.12});
+  document.querySelectorAll('.reveal').forEach(function(el){ obs.observe(el); });
+})();
+</script>
+</body>
+</html>

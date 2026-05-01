@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logistic Regression — IIITB ML Path</title>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg-deep: #0a1020; --bg-mid: #0f1628; --bg-light: #1a2a4a; --bg-accent: #1e3a5f;
+  --glass-bg: rgba(255,255,255,0.04); --glass-border: rgba(255,255,255,0.10); --glass-border-hover: rgba(255,255,255,0.18);
+  --text-primary: #ffffff; --text-secondary: rgba(255,255,255,0.7); --text-muted: rgba(255,255,255,0.45);
+  --accent-blue: #3b82f6; --accent-indigo: #6366f1; --accent-purple: #8b5cf6;
+  --accent-violet: #a78bfa; --accent-cyan: #06b6d4; --accent-teal: #14b8a6;
+  --accent-amber: #f59e0b; --accent-rose: #fb7185;
+  --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+  --stage-color: #6366f1;
+}
+html { scroll-behavior: smooth; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg-deep); color: var(--text-primary); line-height: 1.6; overflow-x: hidden; }
+body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse at 20% 20%, rgba(59,130,246,0.08) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(139,92,246,0.06) 0%, transparent 50%), linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-mid) 30%, var(--bg-light) 70%, var(--bg-accent) 100%); z-index: -1; }
+.section { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 40px; position: relative; }
+.section-compact { min-height: auto; padding: 60px 40px; }
+.glass-card { background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 32px; position: relative; overflow: hidden; transition: border-color 0.3s, transform 0.3s; }
+.glass-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent); }
+.stage-badge { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 700; color: white; flex-shrink: 0; }
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-delay-1 { transition-delay: 0.1s; } .reveal-delay-2 { transition-delay: 0.2s; } .reveal-delay-3 { transition-delay: 0.3s; }
+.hero { text-align: center; }
+.hero-title { font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 16px; background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.8) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.hero-subtitle { font-size: clamp(1rem, 2vw, 1.25rem); color: var(--text-secondary); margin-bottom: 48px; }
+.hero-tag { display: inline-block; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--stage-color); border: 1px solid rgba(99,102,241,0.3); border-radius: 999px; padding: 6px 16px; margin-bottom: 24px; }
+.scroll-indicator { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); animation: bounce 2s infinite; color: var(--text-muted); font-size: 24px; }
+@keyframes bounce { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(10px); } }
+.stage-container { max-width: 900px; width: 100%; }
+.stage-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+.stage-title { font-size: 1.75rem; font-weight: 700; }
+.stage-description { color: var(--text-secondary); font-size: 1.05rem; margin-bottom: 24px; }
+.stage-content { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+@media (max-width: 768px) { .stage-content { grid-template-columns: 1fr; } }
+.stage-learns h4 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 12px; }
+.stage-learns ul { list-style: none; }
+.stage-learns li { padding: 6px 0; color: var(--text-secondary); position: relative; padding-left: 20px; }
+.stage-learns li::before { content: '\2022'; position: absolute; left: 0; color: var(--stage-color); }
+.stage-visual { display: flex; align-items: center; justify-content: center; min-height: 200px; background: rgba(255,255,255,0.02); border-radius: var(--radius-md); border: 1px solid rgba(255,255,255,0.06); overflow: hidden; flex-direction:column; padding:16px; }
+.insight-box { margin-top: 24px; padding: 16px 20px; background: rgba(99,102,241,0.08); border-left: 3px solid var(--stage-color); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; color: var(--text-secondary); font-style: italic; }
+.takeaways-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; max-width: 1000px; width: 100%; }
+@media (max-width: 768px) { .takeaways-grid { grid-template-columns: 1fr; } }
+.takeaway-card { text-align: center; padding: 32px 24px; }
+.takeaway-icon { font-size: 32px; margin-bottom: 16px; display: block; }
+.takeaway-card h4 { font-size: 1rem; margin-bottom: 8px; }
+.takeaway-card p { font-size: 0.9rem; color: var(--text-secondary); }
+.section-title { font-size: clamp(1.75rem, 3vw, 2.5rem); font-weight: 800; text-align: center; margin-bottom: 16px; }
+.footer { padding: 40px; text-align: center; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid rgba(255,255,255,0.05); }
+.nav-bar { display: flex; justify-content: space-between; align-items: center; padding: 24px 40px; background: rgba(255,255,255,0.02); border-top: 1px solid rgba(255,255,255,0.06); }
+.pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 600px) { .pros-cons { grid-template-columns: 1fr; } }
+.pros-cons-col h4 { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; padding: 6px 12px; border-radius: var(--radius-sm); }
+.pros-col h4 { background: rgba(20,184,166,0.15); color: var(--accent-teal); }
+.cons-col h4 { background: rgba(251,113,133,0.15); color: var(--accent-rose); }
+.pros-cons-col ul { list-style: none; }
+.pros-cons-col li { padding: 5px 0 5px 18px; font-size: 0.9rem; color: var(--text-secondary); position: relative; }
+.pros-cons-col li::before { content: '\2022'; position: absolute; left: 0; }
+.pros-col li::before { color: var(--accent-teal); }
+.cons-col li::before { color: var(--accent-rose); }
+.use-case-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.use-case-tag { font-size: 0.8rem; padding: 4px 12px; border-radius: 999px; background: rgba(255,255,255,0.06); color: var(--text-secondary); border: 1px solid rgba(255,255,255,0.08); }
+@media (max-width: 640px) { .section { padding: 60px 20px; } .section-compact { padding: 40px 20px; } .nav-bar { flex-direction: column; gap: 12px; text-align: center; } }
+</style>
+</head>
+<body>
+
+<section class="section hero">
+  <svg width="200" height="160" viewBox="0 0 200 160" style="margin-bottom:36px;">
+    <path d="M10,80 Q30,80 50,78 Q80,70 100,55 Q120,40 140,25 Q160,15 180,14" stroke="#6366f1" stroke-width="2.5" fill="none" opacity="0.8"/>
+    <text x="12" y="95" fill="#fb7185" font-size="10">0</text>
+    <text x="170" y="22" fill="#14b8a6" font-size="10">1</text>
+    <line x1="10" y1="80" x2="190" y2="80" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <circle cx="55" cy="140" r="5" fill="#fb7185" opacity="0.7"/>
+    <circle cx="75" cy="135" r="5" fill="#fb7185" opacity="0.7"/>
+    <circle cx="95" cy="130" r="5" fill="#fb7185" opacity="0.7"/>
+    <circle cx="110" cy="30" r="5" fill="#14b8a6" opacity="0.7"/>
+    <circle cx="130" cy="25" r="5" fill="#14b8a6" opacity="0.7"/>
+    <circle cx="150" cy="20" r="5" fill="#14b8a6" opacity="0.7"/>
+    <line x1="100" y1="10" x2="100" y2="150" stroke="rgba(245,158,11,0.5)" stroke-width="1.5" stroke-dasharray="4,3"/>
+    <text x="104" y="155" fill="#f59e0b" font-size="9">threshold</text>
+  </svg>
+  <div class="hero-tag">Topic 03 · Phase 1 · Interactive</div>
+  <h1 class="hero-title">Will the Customer Churn?</h1>
+  <p class="hero-subtitle">Logistic Regression — turning a linear model into a probability machine</p>
+  <div class="scroll-indicator">↓</div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header">
+      <div class="stage-badge" style="background:var(--accent-indigo);">1</div>
+      <h2 class="stage-title">The Problem</h2>
+    </div>
+    <p class="stage-description">A telecom company wants to predict which customers will cancel their subscription next month. The target is binary: churn (1) or stay (0). Linear regression would give probabilities outside [0,1] — we need a bounded output.</p>
+    <div class="stage-content">
+      <div class="stage-learns">
+        <h4>What we're trying to solve</h4>
+        <ul>
+          <li>Output a probability between 0 and 1</li>
+          <li>Draw a decision boundary in feature space</li>
+          <li>Handle binary (or multi-class) targets</li>
+          <li>Measure performance with log-loss, AUC, F1</li>
+        </ul>
+      </div>
+      <div class="stage-visual">
+        <div style="display:flex;flex-direction:column;gap:8px;width:100%;max-width:220px;padding:16px;">
+          <div style="background:rgba(251,113,133,0.15);border-radius:var(--radius-sm);padding:8px 12px;font-size:0.85rem;color:var(--accent-rose);">😤 Churned — 15% of customers</div>
+          <div style="background:rgba(20,184,166,0.15);border-radius:var(--radius-sm);padding:8px 12px;font-size:0.85rem;color:var(--accent-teal);">😊 Stayed — 85% of customers</div>
+          <div style="margin-top:8px;font-size:0.8rem;color:var(--text-muted);">Class imbalance — a key challenge</div>
+        </div>
+      </div>
+    </div>
+    <div class="insight-box">"We don't predict churn — we estimate the probability of churn, then decide where to draw the line."</div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header">
+      <div class="stage-badge" style="background:var(--accent-purple);">2</div>
+      <h2 class="stage-title">The Intuition</h2>
+    </div>
+    <p class="stage-description">Logistic regression squashes the output of a linear model through the sigmoid function, which maps any real number to (0,1). Think of it as linear regression with a probability wrapper.</p>
+    <div style="margin-top:20px;">
+      <canvas id="sigmoidCanvas" width="500" height="200" style="display:block;width:100%;max-width:500px;margin:0 auto;border-radius:var(--radius-md);background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);"></canvas>
+      <p style="text-align:center;color:var(--text-muted);font-size:0.82rem;margin-top:8px;">Sigmoid σ(z) = 1/(1+e⁻ᶻ) — always outputs between 0 and 1</p>
+    </div>
+  </div>
+</section>
+
+<!-- Interactive Demo: threshold slider -->
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal" style="max-width:700px;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+      <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#f59e0b,#fb7185);display:flex;align-items:center;justify-content:center;font-size:16px;">⚡</div>
+      <h2 style="font-size:1.5rem;font-weight:700;">Interactive Demo</h2>
+    </div>
+    <p style="color:var(--text-secondary);margin-bottom:20px;font-size:0.95rem;">Adjust the classification threshold and watch the confusion matrix update. Default 0.5 isn't always optimal — lower the threshold to catch more churners (at the cost of more false alarms).</p>
+    <div style="margin-bottom:16px;">
+      <label style="font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:8px;">Decision Threshold: <span id="threshVal" style="color:var(--accent-indigo);font-weight:700;">0.50</span></label>
+      <input type="range" id="threshSlider" min="0" max="100" value="50" style="width:100%;accent-color:var(--accent-indigo);">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div style="background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.2);border-radius:var(--radius-md);padding:20px;text-align:center;">
+        <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;">Confusion Matrix</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:0.85rem;">
+          <div style="background:rgba(20,184,166,0.15);padding:10px;border-radius:6px;"><div style="font-size:1.2rem;font-weight:700;color:var(--accent-teal)" id="cmTP">72</div><div style="color:var(--text-muted);font-size:0.75rem;">TP</div></div>
+          <div style="background:rgba(251,113,133,0.12);padding:10px;border-radius:6px;"><div style="font-size:1.2rem;font-weight:700;color:var(--accent-rose)" id="cmFP">18</div><div style="color:var(--text-muted);font-size:0.75rem;">FP</div></div>
+          <div style="background:rgba(251,113,133,0.12);padding:10px;border-radius:6px;"><div style="font-size:1.2rem;font-weight:700;color:var(--accent-rose)" id="cmFN">28</div><div style="color:var(--text-muted);font-size:0.75rem;">FN</div></div>
+          <div style="background:rgba(20,184,166,0.15);padding:10px;border-radius:6px;"><div style="font-size:1.2rem;font-weight:700;color:var(--accent-teal)" id="cmTN">382</div><div style="color:var(--text-muted);font-size:0.75rem;">TN</div></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="background:rgba(255,255,255,0.04);border-radius:var(--radius-md);padding:14px;">
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">Precision</div>
+          <div style="font-size:1.4rem;font-weight:700;color:var(--accent-indigo)" id="metPrec">0.800</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.04);border-radius:var(--radius-md);padding:14px;">
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">Recall</div>
+          <div style="font-size:1.4rem;font-weight:700;color:var(--accent-cyan)" id="metRecall">0.720</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.04);border-radius:var(--radius-md);padding:14px;">
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">F1 Score</div>
+          <div style="font-size:1.4rem;font-weight:700;color:var(--accent-amber)" id="metF1">0.758</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header">
+      <div class="stage-badge" style="background:var(--accent-purple);">3</div>
+      <h2 class="stage-title">The Math</h2>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;">
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Sigmoid</div>
+        <code style="font-size:1.05rem;color:var(--accent-indigo);">σ(z) = 1 / (1 + e⁻ᶻ) &nbsp;where z = β₀ + β₁x₁ + … + βₙxₙ</code>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;">
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Log-Loss (Binary Cross-Entropy)</div>
+        <code style="font-size:1rem;color:var(--accent-purple);">L = −(1/m) Σ [yᵢ log(ŷᵢ) + (1−yᵢ) log(1−ŷᵢ)]</code>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;">
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Decision Rule</div>
+        <code style="font-size:1rem;color:var(--accent-cyan);">Predict 1 if σ(z) ≥ threshold (default 0.5)</code>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header">
+      <div class="stage-badge" style="background:var(--accent-violet);">4</div>
+      <h2 class="stage-title">Assumptions &amp; Pitfalls</h2>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;">
+        <strong>Class imbalance.</strong> <span style="color:var(--text-secondary);">High accuracy on imbalanced data is misleading — a model predicting "never churn" gets 85% accuracy trivially.</span>
+      </div>
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;">
+        <strong>Threshold ≠ 0.5.</strong> <span style="color:var(--text-secondary);">Optimise threshold on validation data using the F1 score or business cost matrix.</span>
+      </div>
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;">
+        <strong>Non-linear boundaries.</strong> <span style="color:var(--text-secondary);">Logistic regression draws a straight decision boundary. Add polynomial features for curves.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header">
+      <div class="stage-badge" style="background:var(--accent-cyan);">5</div>
+      <h2 class="stage-title">When to Use</h2>
+    </div>
+    <div class="pros-cons">
+      <div class="pros-cons-col pros-col">
+        <h4>Strengths</h4>
+        <ul>
+          <li>Outputs calibrated probabilities</li>
+          <li>Interpretable coefficients (log-odds)</li>
+          <li>Fast to train even at scale</li>
+          <li>Strong baseline for binary classification</li>
+        </ul>
+      </div>
+      <div class="pros-cons-col cons-col">
+        <h4>Limitations</h4>
+        <ul>
+          <li>Linear decision boundary only</li>
+          <li>Struggles with high class imbalance</li>
+          <li>Assumes no severe multicollinearity</li>
+          <li>Not suited for complex feature interactions</li>
+        </ul>
+      </div>
+    </div>
+    <div class="use-case-tags">
+      <span class="use-case-tag">Churn prediction</span>
+      <span class="use-case-tag">Fraud detection</span>
+      <span class="use-case-tag">Medical diagnosis</span>
+      <span class="use-case-tag">Credit scoring</span>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <h2 class="section-title reveal">Key Takeaways</h2>
+  <div class="takeaways-grid">
+    <div class="glass-card takeaway-card reveal reveal-delay-1">
+      <span class="takeaway-icon" style="color:var(--accent-indigo);">🌡️</span>
+      <h4>Sigmoid Squashes to Probability</h4>
+      <p>Any linear combination of features gets mapped to (0,1) — interpretable as the probability of the positive class.</p>
+    </div>
+    <div class="glass-card takeaway-card reveal reveal-delay-2">
+      <span class="takeaway-icon" style="color:var(--accent-purple);">🎚️</span>
+      <h4>Threshold is a Business Decision</h4>
+      <p>Default 0.5 isn't always right. A healthcare model should recall most positives even at the cost of false alarms.</p>
+    </div>
+    <div class="glass-card takeaway-card reveal reveal-delay-3">
+      <span class="takeaway-icon" style="color:var(--accent-cyan);">📈</span>
+      <h4>AUC-ROC Summarises All Thresholds</h4>
+      <p>AUC = 1 is perfect; AUC = 0.5 is random. Use it to compare models independent of threshold.</p>
+    </div>
+  </div>
+</section>
+
+<nav class="nav-bar reveal">
+  <a href="linear-regression.html" style="color:var(--text-secondary);text-decoration:none;font-size:0.95rem;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">← Linear Regression</a>
+  <a href="regularization.html" style="color:var(--text-secondary);text-decoration:none;font-size:0.95rem;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">Regularization →</a>
+</nav>
+<footer class="footer">Built for IIITB Deep Learning Course · 2026</footer>
+
+<script>
+(function(){
+  // Sigmoid curve
+  var c = document.getElementById('sigmoidCanvas');
+  var ctx = c.getContext('2d');
+  var W = c.width, H = c.height;
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(W/2,0); ctx.lineTo(W/2,H); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0,H/2); ctx.lineTo(W,H/2); ctx.stroke();
+  ctx.strokeStyle = '#6366f1';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  for (var i=0; i<W; i++) {
+    var z = (i - W/2) / 40;
+    var s = 1/(1+Math.exp(-z));
+    var y = H - s * H;
+    if (i===0) ctx.moveTo(i,y); else ctx.lineTo(i,y);
+  }
+  ctx.stroke();
+  ctx.fillStyle = 'rgba(255,255,255,0.25)';
+  ctx.font = '11px system-ui';
+  ctx.fillText('z →', W-35, H/2-8);
+  ctx.fillText('1', W/2+5, 14);
+  ctx.fillText('0', W/2+5, H-5);
+  ctx.fillText('0.5', W/2+5, H/2-5);
+
+  // Threshold interactive
+  var slider = document.getElementById('threshSlider');
+  function updateMetrics() {
+    var t = slider.value / 100;
+    document.getElementById('threshVal').textContent = t.toFixed(2);
+    // Simulated confusion matrix that shifts with threshold
+    var total = 500, pos = 100, neg = 400;
+    var recallCurve = Math.min(1, 1 - (t - 0.2) * 1.1);
+    var precCurve = Math.min(1, 0.5 + t * 0.7);
+    recallCurve = Math.max(0.1, recallCurve);
+    precCurve = Math.max(0.3, Math.min(0.99, precCurve));
+    var tp = Math.round(pos * recallCurve);
+    var fn = pos - tp;
+    var fp = Math.round(tp / precCurve) - tp;
+    var tn = neg - fp;
+    document.getElementById('cmTP').textContent = tp;
+    document.getElementById('cmFP').textContent = Math.max(0,fp);
+    document.getElementById('cmFN').textContent = fn;
+    document.getElementById('cmTN').textContent = Math.max(0,tn);
+    var prec = tp / (tp + Math.max(0,fp) + 0.001);
+    var rec = tp / pos;
+    var f1 = 2*prec*rec/(prec+rec+0.001);
+    document.getElementById('metPrec').textContent = prec.toFixed(3);
+    document.getElementById('metRecall').textContent = rec.toFixed(3);
+    document.getElementById('metF1').textContent = f1.toFixed(3);
+  }
+  slider.addEventListener('input', updateMetrics);
+
+  var obs = new IntersectionObserver(function(entries){ entries.forEach(function(e){ if(e.isIntersecting) e.target.classList.add('visible'); }); }, {threshold:0.12});
+  document.querySelectorAll('.reveal').forEach(function(el){ obs.observe(el); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boosting — IIITB ML Path</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg-deep:#0a1020;--bg-mid:#0f1628;--bg-light:#1a2a4a;--bg-accent:#1e3a5f;--glass-bg:rgba(255,255,255,0.04);--glass-border:rgba(255,255,255,0.10);--text-primary:#ffffff;--text-secondary:rgba(255,255,255,0.7);--text-muted:rgba(255,255,255,0.45);--accent-blue:#3b82f6;--accent-indigo:#6366f1;--accent-purple:#8b5cf6;--accent-violet:#a78bfa;--accent-cyan:#06b6d4;--accent-teal:#14b8a6;--accent-amber:#f59e0b;--accent-rose:#fb7185;--radius-sm:8px;--radius-md:12px;--radius-lg:16px;--stage-color:#a678fa}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg-deep);color:var(--text-primary);line-height:1.6;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(59,130,246,0.08) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(139,92,246,0.06) 0%,transparent 50%),linear-gradient(180deg,var(--bg-deep) 0%,var(--bg-mid) 30%,var(--bg-light) 70%,var(--bg-accent) 100%);z-index:-1}
+.section{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;position:relative}
+.section-compact{min-height:auto;padding:60px 40px}
+.glass-card{background:var(--glass-bg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:32px;position:relative;overflow:hidden;transition:border-color 0.3s,transform 0.3s}
+.glass-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent)}
+.stage-badge{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:var(--radius-sm);font-size:14px;font-weight:700;color:white;flex-shrink:0}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity 0.7s ease,transform 0.7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:0.1s}.reveal-delay-2{transition-delay:0.2s}.reveal-delay-3{transition-delay:0.3s}
+.hero{text-align:center}
+.hero-title{font-size:clamp(2.5rem,5vw,4rem);font-weight:800;letter-spacing:-0.02em;margin-bottom:16px;background:linear-gradient(135deg,#fff 0%,rgba(255,255,255,0.8) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-subtitle{font-size:clamp(1rem,2vw,1.25rem);color:var(--text-secondary);margin-bottom:48px}
+.hero-tag{display:inline-block;font-size:0.75rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--stage-color);border:1px solid rgba(166,120,250,0.3);border-radius:999px;padding:6px 16px;margin-bottom:24px}
+.scroll-indicator{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);animation:bounce 2s infinite;color:var(--text-muted);font-size:24px}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(10px)}}
+.stage-container{max-width:900px;width:100%}
+.stage-header{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+.stage-title{font-size:1.75rem;font-weight:700}
+.stage-description{color:var(--text-secondary);font-size:1.05rem;margin-bottom:24px}
+.insight-box{margin-top:24px;padding:16px 20px;background:rgba(166,120,250,0.08);border-left:3px solid var(--stage-color);border-radius:0 var(--radius-sm) var(--radius-sm) 0;color:var(--text-secondary);font-style:italic}
+.takeaways-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1000px;width:100%}
+@media(max-width:768px){.takeaways-grid{grid-template-columns:1fr}}
+.takeaway-card{text-align:center;padding:32px 24px}
+.takeaway-icon{font-size:32px;margin-bottom:16px;display:block}
+.takeaway-card h4{font-size:1rem;margin-bottom:8px}
+.takeaway-card p{font-size:0.9rem;color:var(--text-secondary)}
+.section-title{font-size:clamp(1.75rem,3vw,2.5rem);font-weight:800;text-align:center;margin-bottom:16px}
+.footer{padding:40px;text-align:center;color:var(--text-muted);font-size:0.85rem;border-top:1px solid rgba(255,255,255,0.05)}
+.nav-bar{display:flex;justify-content:space-between;align-items:center;padding:24px 40px;background:rgba(255,255,255,0.02);border-top:1px solid rgba(255,255,255,0.06)}
+.pros-cons{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:600px){.pros-cons{grid-template-columns:1fr}}
+.pros-cons-col h4{font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px;padding:6px 12px;border-radius:var(--radius-sm)}
+.pros-col h4{background:rgba(20,184,166,0.15);color:var(--accent-teal)}
+.cons-col h4{background:rgba(251,113,133,0.15);color:var(--accent-rose)}
+.pros-cons-col ul{list-style:none}
+.pros-cons-col li{padding:5px 0 5px 18px;font-size:0.9rem;color:var(--text-secondary);position:relative}
+.pros-cons-col li::before{content:'\2022';position:absolute;left:0}
+.pros-col li::before{color:var(--accent-teal)}
+.cons-col li::before{color:var(--accent-rose)}
+.use-case-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.use-case-tag{font-size:0.8rem;padding:4px 12px;border-radius:999px;background:rgba(255,255,255,0.06);color:var(--text-secondary);border:1px solid rgba(255,255,255,0.08)}
+@media(max-width:640px){.section{padding:60px 20px}.section-compact{padding:40px 20px}.nav-bar{flex-direction:column;gap:12px;text-align:center}}
+</style>
+</head>
+<body>
+
+<section class="section hero">
+  <div id="boostHero" style="width:100%;max-width:400px;margin-bottom:36px;"></div>
+  <div class="hero-tag">Topic 08 · Phase 2 · Animated</div>
+  <h1 class="hero-title">Learn from Your Mistakes</h1>
+  <p class="hero-subtitle">Boosting — sequential learners that each correct the errors of the previous</p>
+  <div class="scroll-indicator">↓</div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--stage-color);">1</div><h2 class="stage-title">The Problem</h2></div>
+    <p class="stage-description">Random Forest builds trees in parallel independently. Can we do better by building trees sequentially, each one focused on fixing the mistakes of the previous ones?</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;">
+      <div style="background:rgba(152,104,248,0.08);border-radius:var(--radius-md);padding:16px;text-align:center;"><div style="font-size:1.5rem;">🌲 + 🌲 + 🌲</div><div style="font-weight:700;margin-top:8px;">Random Forest</div><div style="color:var(--text-muted);font-size:0.82rem;margin-top:4px;">Parallel, independent trees</div></div>
+      <div style="background:rgba(166,120,250,0.08);border-radius:var(--radius-md);padding:16px;text-align:center;"><div style="font-size:1.5rem;">🌲→🌲→🌲</div><div style="font-weight:700;margin-top:8px;">Boosting</div><div style="color:var(--text-muted);font-size:0.82rem;margin-top:4px;">Sequential, error-correcting</div></div>
+    </div>
+    <div class="insight-box">"XGBoost wins more Kaggle competitions than any other algorithm — boosting done right is nearly unbeatable on structured data."</div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-indigo);">2</div><h2 class="stage-title">The Intuition</h2></div>
+    <p class="stage-description">Each new tree is trained to predict the <em>residuals</em> (errors) of all previous trees combined. The final prediction sums up all the trees, each weighted by a learning rate.</p>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px;">
+      <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.03);border-radius:var(--radius-sm);">
+        <div style="width:32px;height:32px;border-radius:50%;background:rgba(166,120,250,0.3);display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">1</div>
+        <div style="font-size:0.9rem;color:var(--text-secondary);">Tree 1 fits data → residuals are large</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.03);border-radius:var(--radius-sm);">
+        <div style="width:32px;height:32px;border-radius:50%;background:rgba(166,120,250,0.4);display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">2</div>
+        <div style="font-size:0.9rem;color:var(--text-secondary);">Tree 2 fits residuals of Tree 1 → residuals shrink</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.03);border-radius:var(--radius-sm);">
+        <div style="width:32px;height:32px;border-radius:50%;background:rgba(166,120,250,0.6);display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">N</div>
+        <div style="font-size:0.9rem;color:var(--text-secondary);">Tree N fits tiny residuals → near-perfect fit</div>
+      </div>
+      <div style="padding:12px;background:rgba(20,184,166,0.08);border:1px solid rgba(20,184,166,0.2);border-radius:var(--radius-sm);font-size:0.9rem;color:var(--text-secondary);">Final: ŷ = η·f₁(x) + η·f₂(x) + … + η·fₙ(x) where η = learning rate</div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-purple);">3</div><h2 class="stage-title">The Math</h2></div>
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;">
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Gradient Boosting Update</div>
+        <code style="color:var(--stage-color);font-size:1rem;">F_m(x) = F_{m-1}(x) + η · h_m(x)</code>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:6px;">h_m fits the negative gradient of the loss (= residuals for MSE loss)</p>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;">
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">XGBoost Adds Regularisation</div>
+        <code style="color:var(--accent-indigo);font-size:1rem;">L = Σ l(yᵢ, ŷᵢ) + Σ Ω(fₖ) &nbsp;where Ω = γT + ½λ‖w‖²</code>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;">
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Key Hyperparameters</div>
+        <p style="color:var(--text-secondary);font-size:0.9rem;"><code style="color:var(--accent-amber);">n_estimators</code> — number of trees &nbsp;|&nbsp; <code style="color:var(--accent-amber);">learning_rate (η)</code> — step size &nbsp;|&nbsp; <code style="color:var(--accent-amber);">max_depth</code> — tree complexity</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-violet);">4</div><h2 class="stage-title">Assumptions &amp; Pitfalls</h2></div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;"><strong>Overfitting with too many trees.</strong> <span style="color:var(--text-secondary);">Unlike Random Forest, boosting can overfit if n_estimators is too large. Use early stopping.</span></div>
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;"><strong>Sensitive to outliers.</strong> <span style="color:var(--text-secondary);">Boosting focuses on hard examples — outliers get disproportionate weight. Use Huber loss.</span></div>
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;"><strong>Slow training.</strong> <span style="color:var(--text-secondary);">Sequential by nature. XGBoost and LightGBM use optimisations (histogram-based, GPU) to speed this up.</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-cyan);">5</div><h2 class="stage-title">When to Use</h2></div>
+    <div class="pros-cons">
+      <div class="pros-cons-col pros-col"><h4>Strengths</h4><ul><li>State-of-the-art on structured/tabular data</li><li>Handles mixed feature types</li><li>Built-in regularisation (XGBoost)</li><li>Flexible loss functions</li></ul></div>
+      <div class="pros-cons-col cons-col"><h4>Limitations</h4><ul><li>Can overfit (needs early stopping)</li><li>More hyperparameters than Random Forest</li><li>Not interpretable</li><li>Slow on very large datasets (vs LightGBM)</li></ul></div>
+    </div>
+    <div class="use-case-tags">
+      <span class="use-case-tag">Kaggle competitions</span>
+      <span class="use-case-tag">Click-through rate prediction</span>
+      <span class="use-case-tag">Credit risk</span>
+      <span class="use-case-tag">Ranking problems</span>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <h2 class="section-title reveal">Key Takeaways</h2>
+  <div class="takeaways-grid">
+    <div class="glass-card takeaway-card reveal reveal-delay-1"><span class="takeaway-icon" style="color:var(--stage-color);">📉</span><h4>Each Tree Corrects Errors</h4><p>New trees focus on the hardest examples — the ones previous trees got wrong. Errors shrink with each round.</p></div>
+    <div class="glass-card takeaway-card reveal reveal-delay-2"><span class="takeaway-icon" style="color:var(--accent-amber);">⚡</span><h4>Learning Rate Matters</h4><p>Lower η = more trees needed but better generalisation. Common practice: 0.01–0.1 with early stopping.</p></div>
+    <div class="glass-card takeaway-card reveal reveal-delay-3"><span class="takeaway-icon" style="color:var(--accent-cyan);">🏅</span><h4>XGBoost / LightGBM</h4><p>Modern boosting adds L1/L2 regularisation, histogram tricks, and GPU support. Always prefer XGBoost over vanilla GBM.</p></div>
+  </div>
+</section>
+
+<nav class="nav-bar reveal">
+  <a href="random-forest.html" style="color:var(--text-secondary);text-decoration:none;font-size:0.95rem;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">← Random Forest</a>
+  <a href="svm.html" style="color:var(--text-secondary);text-decoration:none;font-size:0.95rem;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">SVM →</a>
+</nav>
+<footer class="footer">Built for IIITB Deep Learning Course · 2026</footer>
+
+<script>
+(function(){
+  var hero = document.getElementById('boostHero');
+  var rounds = [100, 68, 42, 25, 14, 8, 4, 2];
+  var colors = ['#fb7185','#f97316','#f59e0b','#eab308','#84cc16','#22c55e','#14b8a6','#06b6d4'];
+  var bars = [];
+  rounds.forEach(function(h, i) {
+    var wrap = document.createElement('div');
+    wrap.style.cssText = 'display:flex;align-items:center;gap:10px;margin-bottom:8px;';
+    var lbl = document.createElement('div');
+    lbl.style.cssText = 'font-size:0.75rem;color:var(--text-muted);width:50px;flex-shrink:0;';
+    lbl.textContent = 'Round ' + (i+1);
+    var track = document.createElement('div');
+    track.style.cssText = 'flex:1;height:18px;background:rgba(255,255,255,0.04);border-radius:4px;overflow:hidden;';
+    var fill = document.createElement('div');
+    fill.style.cssText = 'height:100%;border-radius:4px;width:0%;transition:width 0.8s ease '+((i*0.15))+'s;background:'+colors[i]+';';
+    var pct = document.createElement('div');
+    pct.style.cssText = 'font-size:0.75rem;color:var(--text-muted);width:35px;text-align:right;';
+    pct.textContent = h + '%';
+    track.appendChild(fill);
+    wrap.appendChild(lbl); wrap.appendChild(track); wrap.appendChild(pct);
+    hero.appendChild(wrap);
+    bars.push(fill);
+  });
+  setTimeout(function(){ bars.forEach(function(b, i){ b.style.width = rounds[i] + '%'; }); }, 400);
+  var obs = new IntersectionObserver(function(entries){ entries.forEach(function(e){ if(e.isIntersecting) e.target.classList.add('visible'); }); }, {threshold:0.12});
+  document.querySelectorAll('.reveal').forEach(function(el){ obs.observe(el); });
+})();
+</script>
+</body>
+</html>

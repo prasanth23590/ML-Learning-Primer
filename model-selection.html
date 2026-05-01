@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Model Selection — IIITB ML Path</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg-deep:#0a1020;--bg-mid:#0f1628;--bg-light:#1a2a4a;--bg-accent:#1e3a5f;--glass-bg:rgba(255,255,255,0.04);--glass-border:rgba(255,255,255,0.10);--text-primary:#ffffff;--text-secondary:rgba(255,255,255,0.7);--text-muted:rgba(255,255,255,0.45);--accent-blue:#3b82f6;--accent-indigo:#6366f1;--accent-purple:#8b5cf6;--accent-violet:#a78bfa;--accent-cyan:#06b6d4;--accent-teal:#14b8a6;--accent-amber:#f59e0b;--accent-rose:#fb7185;--radius-sm:8px;--radius-md:12px;--radius-lg:16px;--stage-color:#1ac4b0}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg-deep);color:var(--text-primary);line-height:1.6;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(59,130,246,0.08) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(139,92,246,0.06) 0%,transparent 50%),linear-gradient(180deg,var(--bg-deep) 0%,var(--bg-mid) 30%,var(--bg-light) 70%,var(--bg-accent) 100%);z-index:-1}
+.section{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;position:relative}
+.section-compact{min-height:auto;padding:60px 40px}
+.glass-card{background:var(--glass-bg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:32px;position:relative;overflow:hidden;transition:border-color 0.3s,transform 0.3s}
+.glass-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent)}
+.stage-badge{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:var(--radius-sm);font-size:14px;font-weight:700;color:white;flex-shrink:0}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity 0.7s ease,transform 0.7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:0.1s}.reveal-delay-2{transition-delay:0.2s}.reveal-delay-3{transition-delay:0.3s}
+.hero{text-align:center}
+.hero-title{font-size:clamp(2.5rem,5vw,4rem);font-weight:800;letter-spacing:-0.02em;margin-bottom:16px;background:linear-gradient(135deg,#fff 0%,rgba(255,255,255,0.8) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-subtitle{font-size:clamp(1rem,2vw,1.25rem);color:var(--text-secondary);margin-bottom:48px}
+.hero-tag{display:inline-block;font-size:0.75rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--stage-color);border:1px solid rgba(26,196,176,0.3);border-radius:999px;padding:6px 16px;margin-bottom:24px}
+.scroll-indicator{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);animation:bounce 2s infinite;color:var(--text-muted);font-size:24px}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(10px)}}
+.stage-container{max-width:900px;width:100%}
+.stage-header{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+.stage-title{font-size:1.75rem;font-weight:700}
+.stage-description{color:var(--text-secondary);font-size:1.05rem;margin-bottom:24px}
+.insight-box{margin-top:24px;padding:16px 20px;background:rgba(26,196,176,0.08);border-left:3px solid var(--stage-color);border-radius:0 var(--radius-sm) var(--radius-sm) 0;color:var(--text-secondary);font-style:italic}
+.takeaways-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1000px;width:100%}
+@media(max-width:768px){.takeaways-grid{grid-template-columns:1fr}}
+.takeaway-card{text-align:center;padding:32px 24px}
+.takeaway-icon{font-size:32px;margin-bottom:16px;display:block}
+.takeaway-card h4{font-size:1rem;margin-bottom:8px}
+.takeaway-card p{font-size:0.9rem;color:var(--text-secondary)}
+.section-title{font-size:clamp(1.75rem,3vw,2.5rem);font-weight:800;text-align:center;margin-bottom:16px}
+.footer{padding:40px;text-align:center;color:var(--text-muted);font-size:0.85rem;border-top:1px solid rgba(255,255,255,0.05)}
+.nav-bar{display:flex;justify-content:space-between;align-items:center;padding:24px 40px;background:rgba(255,255,255,0.02);border-top:1px solid rgba(255,255,255,0.06)}
+.pros-cons{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:600px){.pros-cons{grid-template-columns:1fr}}
+.pros-cons-col h4{font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px;padding:6px 12px;border-radius:var(--radius-sm)}
+.pros-col h4{background:rgba(20,184,166,0.15);color:var(--accent-teal)}
+.cons-col h4{background:rgba(251,113,133,0.15);color:var(--accent-rose)}
+.pros-cons-col ul{list-style:none}
+.pros-cons-col li{padding:5px 0 5px 18px;font-size:0.9rem;color:var(--text-secondary);position:relative}
+.pros-cons-col li::before{content:'\2022';position:absolute;left:0}
+.pros-col li::before{color:var(--accent-teal)}
+.cons-col li::before{color:var(--accent-rose)}
+.use-case-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.use-case-tag{font-size:0.8rem;padding:4px 12px;border-radius:999px;background:rgba(255,255,255,0.06);color:var(--text-secondary);border:1px solid rgba(255,255,255,0.08)}
+.cv-fold{height:20px;border-radius:4px;transition:background 0.3s;}
+@media(max-width:640px){.section{padding:60px 20px}.section-compact{padding:40px 20px}.nav-bar{flex-direction:column;gap:12px;text-align:center}}
+</style>
+</head>
+<body>
+
+<section class="section hero">
+  <div id="cvHero" style="width:100%;max-width:360px;margin-bottom:36px;"></div>
+  <div class="hero-tag">Topic 13 · Phase 3 · Animated</div>
+  <h1 class="hero-title">Which Model Should You Trust?</h1>
+  <p class="hero-subtitle">Model Selection — cross-validation, information criteria, and hyperparameter tuning</p>
+  <div class="scroll-indicator">↓</div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--stage-color);">1</div><h2 class="stage-title">The Problem</h2></div>
+    <p class="stage-description">You've trained a linear regression, a Random Forest, and an XGBoost on the same dataset. They all look good on training data. Which one will generalise to unseen data? You can't tell without a rigorous evaluation framework.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:8px;">
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:14px;text-align:center;"><div style="font-size:1.5rem;margin-bottom:6px;">📏</div><div style="font-size:0.85rem;font-weight:700;">Linear</div><div style="font-size:0.8rem;color:var(--text-muted);">Train: 0.81<br>Test: ???</div></div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:14px;text-align:center;"><div style="font-size:1.5rem;margin-bottom:6px;">🌳</div><div style="font-size:0.85rem;font-weight:700;">RF</div><div style="font-size:0.8rem;color:var(--text-muted);">Train: 0.97<br>Test: ???</div></div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:14px;text-align:center;"><div style="font-size:1.5rem;margin-bottom:6px;">⚡</div><div style="font-size:0.85rem;font-weight:700;">XGBoost</div><div style="font-size:0.8rem;color:var(--text-muted);">Train: 0.95<br>Test: ???</div></div>
+    </div>
+    <div class="insight-box">"Training performance tells you about the past. Cross-validation tells you about the future."</div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-indigo);">2</div><h2 class="stage-title">The Intuition</h2></div>
+    <p class="stage-description">K-Fold cross-validation splits data into K equal folds. Train on K-1 folds, test on the remaining fold. Rotate until every fold has been the test set. Average the K scores. This uses all your data for both training and testing.</p>
+    <div style="margin-top:16px;" id="cvViz"></div>
+    <div style="text-align:center;color:var(--text-muted);font-size:0.82rem;margin-top:8px;">5-Fold CV: each fold takes a turn as test set</div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-purple);">3</div><h2 class="stage-title">The Math</h2></div>
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;"><div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">K-Fold CV Score</div><code style="color:var(--stage-color);font-size:1rem;">CV = (1/K) Σₖ score(model trained on D\Dₖ, evaluated on Dₖ)</code></div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;"><div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">AIC / BIC (penalise complexity)</div><code style="color:var(--accent-indigo);font-size:1rem;">AIC = 2k − 2ln(L̂) &nbsp;|&nbsp; BIC = k·ln(n) − 2ln(L̂)</code><p style="color:var(--text-muted);font-size:0.85rem;margin-top:6px;">k = parameters, L̂ = likelihood, n = observations. Lower = better.</p></div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;"><div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Hyperparameter Search</div><p style="color:var(--text-secondary);font-size:0.9rem;"><code style="color:var(--accent-teal);">GridSearchCV</code> — exhaustive (slow). <code style="color:var(--accent-teal);">RandomizedSearchCV</code> — random sample (faster). <code style="color:var(--accent-teal);">Optuna/Hyperopt</code> — Bayesian (smartest).</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-violet);">4</div><h2 class="stage-title">Assumptions &amp; Pitfalls</h2></div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;"><strong>Data leakage.</strong> <span style="color:var(--text-secondary);">Preprocessing (scaling, feature selection) must happen inside the CV loop, not before. Otherwise you've snooped at the test data.</span></div>
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;"><strong>Test set must be held out until the end.</strong> <span style="color:var(--text-secondary);">Once you use the test set to tune hyperparameters, it's no longer a test set — it becomes validation data.</span></div>
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;"><strong>Time series: no random splits.</strong> <span style="color:var(--text-secondary);">For temporal data, always use TimeSeriesSplit — train on past, test on future. Never shuffle.</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-teal);">5</div><h2 class="stage-title">When to Use</h2></div>
+    <div class="pros-cons">
+      <div class="pros-cons-col pros-col"><h4>Strengths</h4><ul><li>Unbiased estimate of generalisation error</li><li>Uses all data efficiently</li><li>Detects data leakage and overfit</li><li>Enables fair model comparisons</li></ul></div>
+      <div class="pros-cons-col cons-col"><h4>Limitations</h4><ul><li>K × training time cost</li><li>Variance in small datasets</li><li>Wrong for time series without care</li><li>Doesn't replace a true held-out test set</li></ul></div>
+    </div>
+    <div class="use-case-tags">
+      <span class="use-case-tag">Any model comparison</span>
+      <span class="use-case-tag">Hyperparameter tuning</span>
+      <span class="use-case-tag">Feature selection</span>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <h2 class="section-title reveal">Key Takeaways</h2>
+  <div class="takeaways-grid">
+    <div class="glass-card takeaway-card reveal reveal-delay-1"><span class="takeaway-icon" style="color:var(--stage-color);">🔄</span><h4>Cross-Validate Everything</h4><p>Never compare models on the training set. 5-fold CV is the minimum; 10-fold for smaller datasets.</p></div>
+    <div class="glass-card takeaway-card reveal reveal-delay-2"><span class="takeaway-icon" style="color:var(--accent-indigo);">🚰</span><h4>Avoid Data Leakage</h4><p>Put all preprocessing inside a Pipeline and inside the CV loop. A single leaked data point can produce optimistically wrong results.</p></div>
+    <div class="glass-card takeaway-card reveal reveal-delay-3"><span class="takeaway-icon" style="color:var(--accent-amber);">🎯</span><h4>One True Test Set</h4><p>Hold out a final test set. Touch it exactly once — after all tuning is done. Its result is your honest performance estimate.</p></div>
+  </div>
+</section>
+
+<nav class="nav-bar reveal">
+  <a href="pca.html" style="color:var(--text-secondary);text-decoration:none;font-size:0.95rem;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">← PCA</a>
+  <a href="neural-networks.html" style="color:var(--text-secondary);text-decoration:none;font-size:0.95rem;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">Neural Networks →</a>
+</nav>
+<footer class="footer">Built for IIITB Deep Learning Course · 2026</footer>
+
+<script>
+(function(){
+  // Hero animated CV folds
+  var heroEl = document.getElementById('cvHero');
+  var K = 5;
+  var colors = ['#3b82f6','#6366f1','#8b5cf6','#06b6d4','#14b8a6'];
+  var activeFold = 0;
+  function buildHero() {
+    while(heroEl.firstChild) heroEl.removeChild(heroEl.firstChild);
+    var lbl = document.createElement('div');
+    lbl.style.cssText='font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;text-align:center;';
+    lbl.textContent = 'Fold ' + (activeFold+1) + ' = Test Set';
+    heroEl.appendChild(lbl);
+    for(var i=0;i<K;i++){
+      var row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:4px;margin-bottom:4px;';
+      for(var j=0;j<K;j++){
+        var cell = document.createElement('div');
+        cell.style.cssText = 'flex:1;height:20px;border-radius:4px;transition:background 0.4s;';
+        if(j===activeFold) cell.style.background = colors[i];
+        else cell.style.background = 'rgba(255,255,255,0.06)';
+        row.appendChild(cell);
+      }
+      heroEl.appendChild(row);
+    }
+  }
+  buildHero();
+  setInterval(function(){ activeFold=(activeFold+1)%K; buildHero(); }, 900);
+
+  // Inline CV viz
+  var cvDiv = document.getElementById('cvViz');
+  for(var r=0;r<5;r++){
+    var row2 = document.createElement('div');
+    row2.style.cssText = 'display:flex;gap:4px;margin-bottom:4px;align-items:center;';
+    var rlbl = document.createElement('div');
+    rlbl.style.cssText = 'font-size:0.75rem;color:var(--text-muted);width:50px;';
+    rlbl.textContent = 'Fold '+(r+1);
+    row2.appendChild(rlbl);
+    for(var c2=0;c2<5;c2++){
+      var cell2 = document.createElement('div');
+      cell2.style.cssText = 'flex:1;height:18px;border-radius:3px;';
+      if(c2===r) cell2.style.background='rgba(26,196,176,0.7)';
+      else cell2.style.background='rgba(59,130,246,0.3)';
+      row2.appendChild(cell2);
+    }
+    cvDiv.appendChild(row2);
+  }
+  var legend = document.createElement('div');
+  legend.style.cssText='display:flex;gap:16px;margin-top:8px;';
+  [['rgba(26,196,176,0.7)','Test'],['rgba(59,130,246,0.3)','Train']].forEach(function(l){
+    var item=document.createElement('div'); item.style.cssText='display:flex;align-items:center;gap:6px;font-size:0.75rem;color:var(--text-muted);';
+    var sq=document.createElement('div'); sq.style.cssText='width:12px;height:12px;border-radius:2px;background:'+l[0]+';';
+    item.appendChild(sq); item.appendChild(document.createTextNode(l[1]));
+    legend.appendChild(item);
+  });
+  cvDiv.appendChild(legend);
+
+  var obs = new IntersectionObserver(function(entries){ entries.forEach(function(e){ if(e.isIntersecting) e.target.classList.add('visible'); }); }, {threshold:0.12});
+  document.querySelectorAll('.reveal').forEach(function(el){ obs.observe(el); });
+})();
+</script>
+</body>
+</html>

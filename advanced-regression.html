@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Regression — IIITB ML Path</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg-deep:#0a1020;--bg-mid:#0f1628;--bg-light:#1a2a4a;--bg-accent:#1e3a5f;--glass-bg:rgba(255,255,255,0.04);--glass-border:rgba(255,255,255,0.10);--text-primary:#ffffff;--text-secondary:rgba(255,255,255,0.7);--text-muted:rgba(255,255,255,0.45);--accent-blue:#3b82f6;--accent-indigo:#6366f1;--accent-purple:#8b5cf6;--accent-violet:#a78bfa;--accent-cyan:#06b6d4;--accent-teal:#14b8a6;--accent-amber:#f59e0b;--accent-rose:#fb7185;--radius-sm:8px;--radius-md:12px;--radius-lg:16px;--stage-color:#8176f4}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg-deep);color:var(--text-primary);line-height:1.6;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(59,130,246,0.08) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(139,92,246,0.06) 0%,transparent 50%),linear-gradient(180deg,var(--bg-deep) 0%,var(--bg-mid) 30%,var(--bg-light) 70%,var(--bg-accent) 100%);z-index:-1}
+.section{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;position:relative}
+.section-compact{min-height:auto;padding:60px 40px}
+.glass-card{background:var(--glass-bg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:32px;position:relative;overflow:hidden;transition:border-color 0.3s,transform 0.3s}
+.glass-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent)}
+.stage-badge{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:var(--radius-sm);font-size:14px;font-weight:700;color:white;flex-shrink:0}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity 0.7s ease,transform 0.7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:0.1s}.reveal-delay-2{transition-delay:0.2s}.reveal-delay-3{transition-delay:0.3s}
+.hero{text-align:center}
+.hero-title{font-size:clamp(2.5rem,5vw,4rem);font-weight:800;letter-spacing:-0.02em;margin-bottom:16px;background:linear-gradient(135deg,#fff 0%,rgba(255,255,255,0.8) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-subtitle{font-size:clamp(1rem,2vw,1.25rem);color:var(--text-secondary);margin-bottom:48px}
+.hero-tag{display:inline-block;font-size:0.75rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--stage-color);border:1px solid rgba(129,118,244,0.3);border-radius:999px;padding:6px 16px;margin-bottom:24px}
+.scroll-indicator{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);animation:bounce 2s infinite;color:var(--text-muted);font-size:24px}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(10px)}}
+.stage-container{max-width:900px;width:100%}
+.stage-header{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+.stage-title{font-size:1.75rem;font-weight:700}
+.stage-description{color:var(--text-secondary);font-size:1.05rem;margin-bottom:24px}
+.insight-box{margin-top:24px;padding:16px 20px;background:rgba(129,118,244,0.08);border-left:3px solid var(--stage-color);border-radius:0 var(--radius-sm) var(--radius-sm) 0;color:var(--text-secondary);font-style:italic}
+.takeaways-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1000px;width:100%}
+@media(max-width:768px){.takeaways-grid{grid-template-columns:1fr}}
+.takeaway-card{text-align:center;padding:32px 24px}
+.takeaway-icon{font-size:32px;margin-bottom:16px;display:block}
+.takeaway-card h4{font-size:1rem;margin-bottom:8px}
+.takeaway-card p{font-size:0.9rem;color:var(--text-secondary)}
+.section-title{font-size:clamp(1.75rem,3vw,2.5rem);font-weight:800;text-align:center;margin-bottom:16px}
+.footer{padding:40px;text-align:center;color:var(--text-muted);font-size:0.85rem;border-top:1px solid rgba(255,255,255,0.05)}
+.nav-bar{display:flex;justify-content:space-between;align-items:center;padding:24px 40px;background:rgba(255,255,255,0.02);border-top:1px solid rgba(255,255,255,0.06)}
+.pros-cons{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:600px){.pros-cons{grid-template-columns:1fr}}
+.pros-cons-col h4{font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px;padding:6px 12px;border-radius:var(--radius-sm)}
+.pros-col h4{background:rgba(20,184,166,0.15);color:var(--accent-teal)}
+.cons-col h4{background:rgba(251,113,133,0.15);color:var(--accent-rose)}
+.pros-cons-col ul{list-style:none}
+.pros-cons-col li{padding:5px 0 5px 18px;font-size:0.9rem;color:var(--text-secondary);position:relative}
+.pros-cons-col li::before{content:'\2022';position:absolute;left:0}
+.pros-col li::before{color:var(--accent-teal)}
+.cons-col li::before{color:var(--accent-rose)}
+.use-case-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.use-case-tag{font-size:0.8rem;padding:4px 12px;border-radius:999px;background:rgba(255,255,255,0.06);color:var(--text-secondary);border:1px solid rgba(255,255,255,0.08)}
+@media(max-width:640px){.section{padding:60px 20px}.section-compact{padding:40px 20px}.nav-bar{flex-direction:column;gap:12px;text-align:center}}
+</style>
+</head>
+<body>
+<section class="section hero">
+  <canvas id="polyHero" width="320" height="160" style="margin-bottom:36px;border-radius:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);max-width:100%;"></canvas>
+  <div class="hero-tag">Topic 05 · Phase 1 · Animated</div>
+  <h1 class="hero-title">When Lines Aren't Enough</h1>
+  <p class="hero-subtitle">Advanced Regression — polynomial features, interactions, and non-linear fits</p>
+  <div class="scroll-indicator">↓</div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header">
+      <div class="stage-badge" style="background:var(--stage-color);">1</div>
+      <h2 class="stage-title">The Problem</h2>
+    </div>
+    <p class="stage-description">A dataset of salary vs years of experience doesn't follow a straight line — early-career growth is steep, senior growth plateaus. A linear model underfits. We need curved fitting.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;">
+      <div style="background:rgba(251,113,133,0.08);border-radius:var(--radius-md);padding:16px;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:4px;">📉</div>
+        <div style="font-weight:700;font-size:0.9rem;">Linear fit</div>
+        <div style="color:var(--text-muted);font-size:0.82rem;margin-top:4px;">Misses the curve — underfits both ends</div>
+      </div>
+      <div style="background:rgba(20,184,166,0.08);border-radius:var(--radius-md);padding:16px;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:4px;">📈</div>
+        <div style="font-weight:700;font-size:0.9rem;">Polynomial fit</div>
+        <div style="color:var(--text-muted);font-size:0.82rem;margin-top:4px;">Captures curvature while staying interpretable</div>
+      </div>
+    </div>
+    <div class="insight-box">"Adding x² to your features doesn't make the model non-linear — it still uses OLS. Only the feature engineering is non-linear."</div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header">
+      <div class="stage-badge" style="background:var(--accent-indigo);">2</div>
+      <h2 class="stage-title">The Intuition</h2>
+    </div>
+    <p class="stage-description">Polynomial regression is still linear regression — we just engineer new features from existing ones. Add x² and x³ as features, then fit a straight line in that higher-dimensional space.</p>
+    <div style="margin-top:16px;display:flex;flex-direction:column;gap:12px;">
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:16px;">
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;">Degree 1 → straight line</div>
+        <code style="color:var(--accent-blue);">ŷ = β₀ + β₁x</code>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:16px;">
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;">Degree 2 → parabola</div>
+        <code style="color:var(--accent-indigo);">ŷ = β₀ + β₁x + β₂x²</code>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:16px;">
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;">Degree 10 → likely overfit</div>
+        <code style="color:var(--accent-rose);">ŷ = β₀ + β₁x + … + β₁₀x¹⁰  ← danger zone</code>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header">
+      <div class="stage-badge" style="background:var(--accent-purple);">3</div>
+      <h2 class="stage-title">The Math</h2>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;">
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Feature Transformation</div>
+        <code style="color:var(--stage-color);">[x] → [1, x, x², x³, …, xᵈ]  then standard OLS</code>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;">
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Interaction Terms</div>
+        <code style="color:var(--accent-cyan);">ŷ = β₀ + β₁x₁ + β₂x₂ + β₃x₁x₂</code>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:8px;">The x₁x₂ term captures how the effect of x₁ depends on x₂.</p>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;">
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Bias-Variance Tradeoff</div>
+        <p style="color:var(--text-secondary);font-size:0.9rem;">As degree ↑: bias ↓, variance ↑. The optimal degree balances both — find it with cross-validation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-violet);">4</div><h2 class="stage-title">Assumptions &amp; Pitfalls</h2></div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;"><strong>Overfitting explodes with high degree.</strong> <span style="color:var(--text-secondary);">Degree ≥ 5 usually overfits unless you regularise.</span></div>
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;"><strong>Extrapolation is dangerous.</strong> <span style="color:var(--text-secondary);">Polynomial curves go wild outside the training data range.</span></div>
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;"><strong>Multicollinearity of polynomial features.</strong> <span style="color:var(--text-secondary);">x, x², x³ are highly correlated. Always pair with Ridge regularisation.</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-cyan);">5</div><h2 class="stage-title">When to Use</h2></div>
+    <div class="pros-cons">
+      <div class="pros-cons-col pros-col"><h4>Strengths</h4><ul><li>Captures curved relationships</li><li>Still interpretable (linear in parameters)</li><li>No new algorithm — reuse OLS</li><li>Interaction terms model dependencies</li></ul></div>
+      <div class="pros-cons-col cons-col"><h4>Limitations</h4><ul><li>Overfits at high degree</li><li>Poor extrapolation</li><li>Feature space explodes with multivariate data</li><li>Requires regularisation</li></ul></div>
+    </div>
+    <div class="use-case-tags">
+      <span class="use-case-tag">Salary vs experience</span>
+      <span class="use-case-tag">Drug dose-response</span>
+      <span class="use-case-tag">Physics-inspired features</span>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <h2 class="section-title reveal">Key Takeaways</h2>
+  <div class="takeaways-grid">
+    <div class="glass-card takeaway-card reveal reveal-delay-1">
+      <span class="takeaway-icon" style="color:var(--stage-color);">🔢</span>
+      <h4>Features, Not Algorithm</h4>
+      <p>Polynomial regression is linear regression with engineered features. The learning algorithm stays the same.</p>
+    </div>
+    <div class="glass-card takeaway-card reveal reveal-delay-2">
+      <span class="takeaway-icon" style="color:var(--accent-amber);">📐</span>
+      <h4>Degree is a Hyperparameter</h4>
+      <p>Tune degree via cross-validation. Pair with Ridge regularisation to avoid overfitting at degrees 3+.</p>
+    </div>
+    <div class="glass-card takeaway-card reveal reveal-delay-3">
+      <span class="takeaway-icon" style="color:var(--accent-cyan);">🔗</span>
+      <h4>Interactions Capture Dependencies</h4>
+      <p>Sometimes x₁ only matters when x₂ is high. Interaction terms like x₁×x₂ encode this dependency explicitly.</p>
+    </div>
+  </div>
+</section>
+
+<nav class="nav-bar reveal">
+  <a href="regularization.html" style="color:var(--text-secondary);text-decoration:none;font-size:0.95rem;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">← Regularization</a>
+  <a href="decision-trees.html" style="color:var(--text-secondary);text-decoration:none;font-size:0.95rem;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">Decision Trees →</a>
+</nav>
+<footer class="footer">Built for IIITB Deep Learning Course · 2026</footer>
+
+<script>
+(function(){
+  var c=document.getElementById('polyHero');
+  var ctx=c.getContext('2d');
+  var W=c.width,H=c.height;
+  var pts=[];
+  for(var i=0;i<20;i++){var x=i/19*W;var xn=i/19*4-2;var y=H/2-xn*xn*30+Math.random()*20-10;pts.push({x:x,y:y});}
+  var degrees=[1,2,3];
+  var colors=['rgba(251,113,133,0.7)','rgba(99,102,241,0.8)','rgba(20,184,166,0.8)'];
+  var labels=['Degree 1','Degree 2','Degree 3'];
+  var cur=0;
+  function draw(deg){
+    ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle='rgba(255,255,255,0.04)';ctx.lineWidth=1;
+    for(var gx=0;gx<W;gx+=40){ctx.beginPath();ctx.moveTo(gx,0);ctx.lineTo(gx,H);ctx.stroke();}
+    for(var gy=0;gy<H;gy+=32){ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(W,gy);ctx.stroke();}
+    pts.forEach(function(p){ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,0.5)';ctx.fill();});
+    ctx.strokeStyle=colors[deg];ctx.lineWidth=2.5;ctx.beginPath();
+    for(var i2=0;i2<W;i2++){
+      var xn2=i2/W*4-2;
+      var y2;
+      if(deg===0) y2=H/2-xn2*35;
+      else if(deg===1) y2=H/2-xn2*xn2*28-xn2*5;
+      else y2=H/2-xn2*xn2*28-xn2*xn2*xn2*5-xn2*3;
+      if(i2===0)ctx.moveTo(i2,y2);else ctx.lineTo(i2,y2);
+    }
+    ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,0.6)';ctx.font='12px system-ui';
+    ctx.fillText(labels[deg],8,18);
+  }
+  draw(0);
+  setInterval(function(){cur=(cur+1)%3;draw(cur);},1800);
+  var obs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible')});},{threshold:0.12});
+  document.querySelectorAll('.reveal').forEach(function(el){obs.observe(el)});
+})();
+</script>
+</body>
+</html>

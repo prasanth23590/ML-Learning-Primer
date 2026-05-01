@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PCA — IIITB ML Path</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg-deep:#0a1020;--bg-mid:#0f1628;--bg-light:#1a2a4a;--bg-accent:#1e3a5f;--glass-bg:rgba(255,255,255,0.04);--glass-border:rgba(255,255,255,0.10);--text-primary:#ffffff;--text-secondary:rgba(255,255,255,0.7);--text-muted:rgba(255,255,255,0.45);--accent-blue:#3b82f6;--accent-indigo:#6366f1;--accent-purple:#8b5cf6;--accent-violet:#a78bfa;--accent-cyan:#06b6d4;--accent-teal:#14b8a6;--accent-amber:#f59e0b;--accent-rose:#fb7185;--radius-sm:8px;--radius-md:12px;--radius-lg:16px;--stage-color:#0dc4d8}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg-deep);color:var(--text-primary);line-height:1.6;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(59,130,246,0.08) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(139,92,246,0.06) 0%,transparent 50%),linear-gradient(180deg,var(--bg-deep) 0%,var(--bg-mid) 30%,var(--bg-light) 70%,var(--bg-accent) 100%);z-index:-1}
+.section{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;position:relative}
+.section-compact{min-height:auto;padding:60px 40px}
+.glass-card{background:var(--glass-bg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:32px;position:relative;overflow:hidden;transition:border-color 0.3s,transform 0.3s}
+.glass-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent)}
+.stage-badge{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:var(--radius-sm);font-size:14px;font-weight:700;color:white;flex-shrink:0}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity 0.7s ease,transform 0.7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:0.1s}.reveal-delay-2{transition-delay:0.2s}.reveal-delay-3{transition-delay:0.3s}
+.hero{text-align:center}
+.hero-title{font-size:clamp(2.5rem,5vw,4rem);font-weight:800;letter-spacing:-0.02em;margin-bottom:16px;background:linear-gradient(135deg,#fff 0%,rgba(255,255,255,0.8) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-subtitle{font-size:clamp(1rem,2vw,1.25rem);color:var(--text-secondary);margin-bottom:48px}
+.hero-tag{display:inline-block;font-size:0.75rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--stage-color);border:1px solid rgba(13,196,216,0.3);border-radius:999px;padding:6px 16px;margin-bottom:24px}
+.scroll-indicator{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);animation:bounce 2s infinite;color:var(--text-muted);font-size:24px}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(10px)}}
+.stage-container{max-width:900px;width:100%}
+.stage-header{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+.stage-title{font-size:1.75rem;font-weight:700}
+.stage-description{color:var(--text-secondary);font-size:1.05rem;margin-bottom:24px}
+.insight-box{margin-top:24px;padding:16px 20px;background:rgba(13,196,216,0.08);border-left:3px solid var(--stage-color);border-radius:0 var(--radius-sm) var(--radius-sm) 0;color:var(--text-secondary);font-style:italic}
+.takeaways-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1000px;width:100%}
+@media(max-width:768px){.takeaways-grid{grid-template-columns:1fr}}
+.takeaway-card{text-align:center;padding:32px 24px}
+.takeaway-icon{font-size:32px;margin-bottom:16px;display:block}
+.takeaway-card h4{font-size:1rem;margin-bottom:8px}
+.takeaway-card p{font-size:0.9rem;color:var(--text-secondary)}
+.section-title{font-size:clamp(1.75rem,3vw,2.5rem);font-weight:800;text-align:center;margin-bottom:16px}
+.footer{padding:40px;text-align:center;color:var(--text-muted);font-size:0.85rem;border-top:1px solid rgba(255,255,255,0.05)}
+.nav-bar{display:flex;justify-content:space-between;align-items:center;padding:24px 40px;background:rgba(255,255,255,0.02);border-top:1px solid rgba(255,255,255,0.06)}
+.pros-cons{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:600px){.pros-cons{grid-template-columns:1fr}}
+.pros-cons-col h4{font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px;padding:6px 12px;border-radius:var(--radius-sm)}
+.pros-col h4{background:rgba(20,184,166,0.15);color:var(--accent-teal)}
+.cons-col h4{background:rgba(251,113,133,0.15);color:var(--accent-rose)}
+.pros-cons-col ul{list-style:none}
+.pros-cons-col li{padding:5px 0 5px 18px;font-size:0.9rem;color:var(--text-secondary);position:relative}
+.pros-cons-col li::before{content:'\2022';position:absolute;left:0}
+.pros-col li::before{color:var(--accent-teal)}
+.cons-col li::before{color:var(--accent-rose)}
+.use-case-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.use-case-tag{font-size:0.8rem;padding:4px 12px;border-radius:999px;background:rgba(255,255,255,0.06);color:var(--text-secondary);border:1px solid rgba(255,255,255,0.08)}
+@media(max-width:640px){.section{padding:60px 20px}.section-compact{padding:40px 20px}.nav-bar{flex-direction:column;gap:12px;text-align:center}}
+</style>
+</head>
+<body>
+
+<section class="section hero">
+  <canvas id="pcaHero" width="280" height="200" style="margin-bottom:36px;border-radius:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);max-width:100%;"></canvas>
+  <div class="hero-tag">Topic 12 · Phase 3 · Interactive</div>
+  <h1 class="hero-title">Compress Without Losing What Matters</h1>
+  <p class="hero-subtitle">PCA — find the directions of maximum variance and project your data there</p>
+  <div class="scroll-indicator">↓</div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--stage-color);">1</div><h2 class="stage-title">The Problem</h2></div>
+    <p class="stage-description">MNIST handwritten digits have 784 features (28×28 pixels). Most pixels are correlated — adjacent pixels tend to have similar values. Can we represent each image with 50 numbers instead of 784, while keeping most of the useful information?</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;">
+      <div style="background:rgba(251,113,133,0.08);border-radius:var(--radius-md);padding:16px;text-align:center;"><div style="font-size:2rem;margin-bottom:6px;">📦</div><div style="font-weight:700;">784 features</div><div style="color:var(--text-muted);font-size:0.82rem;margin-top:4px;">High redundancy — most are correlated</div></div>
+      <div style="background:rgba(13,196,216,0.08);border-radius:var(--radius-md);padding:16px;text-align:center;"><div style="font-size:2rem;margin-bottom:6px;">💎</div><div style="font-weight:700;">50 components</div><div style="color:var(--text-muted);font-size:0.82rem;margin-top:4px;">94% variance retained · 15× compression</div></div>
+    </div>
+    <div class="insight-box">"PCA doesn't select features — it invents new ones that are linear combinations of the originals, maximally spread out."</div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-indigo);">2</div><h2 class="stage-title">The Intuition</h2></div>
+    <p class="stage-description">Imagine a long, thin cloud of points tilted at 45°. The longest direction through the cloud captures most of the spread — that's PC1. The perpendicular direction captures the remaining spread — that's PC2. Project all points onto PC1 and you've compressed from 2D to 1D with minimal information loss.</p>
+    <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px;">
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-sm);padding:14px;display:flex;align-items:center;gap:12px;"><div style="width:24px;height:24px;border-radius:50%;background:rgba(13,196,216,0.3);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;">1</div><div style="font-size:0.9rem;color:var(--text-secondary);">Standardise features (zero mean, unit variance)</div></div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-sm);padding:14px;display:flex;align-items:center;gap:12px;"><div style="width:24px;height:24px;border-radius:50%;background:rgba(13,196,216,0.4);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;">2</div><div style="font-size:0.9rem;color:var(--text-secondary);">Compute covariance matrix XᵀX/n</div></div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-sm);padding:14px;display:flex;align-items:center;gap:12px;"><div style="width:24px;height:24px;border-radius:50%;background:rgba(13,196,216,0.6);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;">3</div><div style="font-size:0.9rem;color:var(--text-secondary);">Find eigenvectors (principal components) and eigenvalues (variance explained)</div></div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-sm);padding:14px;display:flex;align-items:center;gap:12px;"><div style="width:24px;height:24px;border-radius:50%;background:rgba(20,184,166,0.6);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;">4</div><div style="font-size:0.9rem;color:var(--text-secondary);">Project data onto top k eigenvectors</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-purple);">3</div><h2 class="stage-title">The Math</h2></div>
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;"><div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Covariance Matrix</div><code style="color:var(--stage-color);font-size:1rem;">Σ = (1/n) Xᵀ X  (X is zero-mean)</code></div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;"><div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Eigendecomposition</div><code style="color:var(--accent-indigo);font-size:1rem;">Σ v = λ v &nbsp;→&nbsp; v₁ = PC1 direction, λ₁ = variance explained</code></div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;"><div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Variance Explained Ratio</div><code style="color:var(--accent-teal);font-size:1rem;">VER_k = λₖ / Σ λᵢ</code><p style="color:var(--text-muted);font-size:0.85rem;margin-top:6px;">Choose k such that cumulative VER ≥ 90–95%.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-violet);">4</div><h2 class="stage-title">Assumptions &amp; Pitfalls</h2></div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;"><strong>PCA is linear.</strong> <span style="color:var(--text-secondary);">Only captures linear correlations. For non-linear structure, use t-SNE or UMAP for visualisation.</span></div>
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;"><strong>Loses interpretability.</strong> <span style="color:var(--text-secondary);">PC1 is "some combination of all original features". Original feature names are lost.</span></div>
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;"><strong>Sensitive to scaling.</strong> <span style="color:var(--text-secondary);">Always standardise before PCA. A feature with larger variance will dominate without scaling.</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-teal);">5</div><h2 class="stage-title">When to Use</h2></div>
+    <div class="pros-cons">
+      <div class="pros-cons-col pros-col"><h4>Strengths</h4><ul><li>Reduces overfitting in high-dimensional data</li><li>Speeds up downstream models</li><li>Removes multicollinearity</li><li>Enables 2D/3D visualisation of any dataset</li></ul></div>
+      <div class="pros-cons-col cons-col"><h4>Limitations</h4><ul><li>Components are uninterpretable</li><li>Only captures linear variance</li><li>Discards some information</li><li>Requires standardisation first</li></ul></div>
+    </div>
+    <div class="use-case-tags">
+      <span class="use-case-tag">Image compression</span>
+      <span class="use-case-tag">NLP dimensionality reduction</span>
+      <span class="use-case-tag">Genomics</span>
+      <span class="use-case-tag">Noise reduction</span>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <h2 class="section-title reveal">Key Takeaways</h2>
+  <div class="takeaways-grid">
+    <div class="glass-card takeaway-card reveal reveal-delay-1"><span class="takeaway-icon" style="color:var(--stage-color);">📐</span><h4>Eigenvectors = Directions of Variance</h4><p>PCA rotates the coordinate system so PC1 points along the direction of maximum spread in the data.</p></div>
+    <div class="glass-card takeaway-card reveal reveal-delay-2"><span class="takeaway-icon" style="color:var(--accent-indigo);">📉</span><h4>Choose k from Scree Plot</h4><p>Plot cumulative variance explained vs k. Retain enough components to explain 90–95% of variance.</p></div>
+    <div class="glass-card takeaway-card reveal reveal-delay-3"><span class="takeaway-icon" style="color:var(--accent-teal);">🔭</span><h4>Visualise with 2 Components</h4><p>Project any dataset to 2D with PCA for a quick visual inspection of cluster structure before modelling.</p></div>
+  </div>
+</section>
+
+<nav class="nav-bar reveal">
+  <a href="clustering.html" style="color:var(--text-secondary);text-decoration:none;font-size:0.95rem;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">← Clustering</a>
+  <a href="model-selection.html" style="color:var(--text-secondary);text-decoration:none;font-size:0.95rem;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">Model Selection →</a>
+</nav>
+<footer class="footer">Built for IIITB Deep Learning Course · 2026</footer>
+
+<script>
+(function(){
+  var c = document.getElementById('pcaHero');
+  var ctx = c.getContext('2d');
+  var W = c.width, H = c.height;
+  var angle = 0;
+  var pts = [];
+  for(var i=0;i<30;i++){var t=i/30*Math.PI*2; var r=Math.random()*30+10; pts.push({ox:Math.cos(t)*r*2.5+W/2, oy:Math.sin(t)*r*0.6+H/2});}
+  function draw(a){
+    ctx.clearRect(0,0,W,H);
+    var cos=Math.cos(a), sin=Math.sin(a);
+    pts.forEach(function(p){
+      ctx.beginPath(); ctx.arc(p.ox,p.oy,4,0,Math.PI*2);
+      ctx.fillStyle='rgba(13,196,216,0.6)'; ctx.fill();
+    });
+    var len=W*0.45;
+    ctx.strokeStyle='rgba(245,158,11,0.8)'; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.moveTo(W/2-cos*len, H/2-sin*len); ctx.lineTo(W/2+cos*len, H/2+sin*len); ctx.stroke();
+    ctx.strokeStyle='rgba(20,184,166,0.5)'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(W/2-sin*len*0.3, H/2+cos*len*0.3); ctx.lineTo(W/2+sin*len*0.3, H/2-cos*len*0.3); ctx.stroke();
+    ctx.fillStyle='rgba(245,158,11,0.8)'; ctx.font='11px system-ui'; ctx.fillText('PC1', W/2+cos*len+4, H/2+sin*len);
+    ctx.fillStyle='rgba(20,184,166,0.7)'; ctx.fillText('PC2', W/2+sin*len*0.3+4, H/2-cos*len*0.3);
+  }
+  var rotating = false;
+  draw(-0.4);
+  setTimeout(function(){rotating=true;}, 800);
+  setInterval(function(){ if(rotating){ angle+=0.01; draw(angle-0.4); if(angle>0.3){rotating=false;} }}, 30);
+  var obs = new IntersectionObserver(function(entries){ entries.forEach(function(e){ if(e.isIntersecting) e.target.classList.add('visible'); }); }, {threshold:0.12});
+  document.querySelectorAll('.reveal').forEach(function(el){ obs.observe(el); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neural Networks — IIITB ML Path</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg-deep:#0a1020;--bg-mid:#0f1628;--bg-light:#1a2a4a;--bg-accent:#1e3a5f;--glass-bg:rgba(255,255,255,0.04);--glass-border:rgba(255,255,255,0.10);--text-primary:#ffffff;--text-secondary:rgba(255,255,255,0.7);--text-muted:rgba(255,255,255,0.45);--accent-blue:#3b82f6;--accent-indigo:#6366f1;--accent-purple:#8b5cf6;--accent-violet:#a78bfa;--accent-cyan:#06b6d4;--accent-teal:#14b8a6;--accent-amber:#f59e0b;--accent-rose:#fb7185;--radius-sm:8px;--radius-md:12px;--radius-lg:16px;--stage-color:#6366f1}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg-deep);color:var(--text-primary);line-height:1.6;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(59,130,246,0.08) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(139,92,246,0.06) 0%,transparent 50%),linear-gradient(180deg,var(--bg-deep) 0%,var(--bg-mid) 30%,var(--bg-light) 70%,var(--bg-accent) 100%);z-index:-1}
+.section{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;position:relative}
+.section-compact{min-height:auto;padding:60px 40px}
+.glass-card{background:var(--glass-bg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:32px;position:relative;overflow:hidden;transition:border-color 0.3s,transform 0.3s}
+.glass-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent)}
+.stage-badge{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:var(--radius-sm);font-size:14px;font-weight:700;color:white;flex-shrink:0}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity 0.7s ease,transform 0.7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:0.1s}.reveal-delay-2{transition-delay:0.2s}.reveal-delay-3{transition-delay:0.3s}
+.hero{text-align:center}
+.hero-title{font-size:clamp(2.5rem,5vw,4rem);font-weight:800;letter-spacing:-0.02em;margin-bottom:16px;background:linear-gradient(135deg,#fff 0%,rgba(255,255,255,0.8) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-subtitle{font-size:clamp(1rem,2vw,1.25rem);color:var(--text-secondary);margin-bottom:48px}
+.hero-tag{display:inline-block;font-size:0.75rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--stage-color);border:1px solid rgba(99,102,241,0.3);border-radius:999px;padding:6px 16px;margin-bottom:24px}
+.scroll-indicator{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);animation:bounce 2s infinite;color:var(--text-muted);font-size:24px}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(10px)}}
+.stage-container{max-width:900px;width:100%}
+.stage-header{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+.stage-title{font-size:1.75rem;font-weight:700}
+.stage-description{color:var(--text-secondary);font-size:1.05rem;margin-bottom:24px}
+.insight-box{margin-top:24px;padding:16px 20px;background:rgba(99,102,241,0.08);border-left:3px solid var(--stage-color);border-radius:0 var(--radius-sm) var(--radius-sm) 0;color:var(--text-secondary);font-style:italic}
+.takeaways-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1000px;width:100%}
+@media(max-width:768px){.takeaways-grid{grid-template-columns:1fr}}
+.takeaway-card{text-align:center;padding:32px 24px}
+.takeaway-icon{font-size:32px;margin-bottom:16px;display:block}
+.takeaway-card h4{font-size:1rem;margin-bottom:8px}
+.takeaway-card p{font-size:0.9rem;color:var(--text-secondary)}
+.section-title{font-size:clamp(1.75rem,3vw,2.5rem);font-weight:800;text-align:center;margin-bottom:16px}
+.footer{padding:40px;text-align:center;color:var(--text-muted);font-size:0.85rem;border-top:1px solid rgba(255,255,255,0.05)}
+.nav-bar{display:flex;justify-content:space-between;align-items:center;padding:24px 40px;background:rgba(255,255,255,0.02);border-top:1px solid rgba(255,255,255,0.06)}
+.pros-cons{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:600px){.pros-cons{grid-template-columns:1fr}}
+.pros-cons-col h4{font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px;padding:6px 12px;border-radius:var(--radius-sm)}
+.pros-col h4{background:rgba(20,184,166,0.15);color:var(--accent-teal)}
+.cons-col h4{background:rgba(251,113,133,0.15);color:var(--accent-rose)}
+.pros-cons-col ul{list-style:none}
+.pros-cons-col li{padding:5px 0 5px 18px;font-size:0.9rem;color:var(--text-secondary);position:relative}
+.pros-cons-col li::before{content:'\2022';position:absolute;left:0}
+.pros-col li::before{color:var(--accent-teal)}
+.cons-col li::before{color:var(--accent-rose)}
+.use-case-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.use-case-tag{font-size:0.8rem;padding:4px 12px;border-radius:999px;background:rgba(255,255,255,0.06);color:var(--text-secondary);border:1px solid rgba(255,255,255,0.08)}
+.nn-slider-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.nn-slider-row label{font-size:0.82rem;color:var(--text-muted);width:48px;text-align:right;flex-shrink:0;}
+.nn-slider-row input[type=range]{flex:1;accent-color:var(--stage-color);}
+.nn-slider-row .val{font-size:0.82rem;color:var(--stage-color);font-weight:700;width:36px;text-align:left;flex-shrink:0;}
+@media(max-width:640px){.section{padding:60px 20px}.section-compact{padding:40px 20px}.nav-bar{flex-direction:column;gap:12px;text-align:center}}
+</style>
+</head>
+<body>
+
+<section class="section hero">
+  <canvas id="nnHero" width="340" height="200" style="margin-bottom:36px;border-radius:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);max-width:100%;"></canvas>
+  <div class="hero-tag">Topic 14 · Phase 3 · Interactive</div>
+  <h1 class="hero-title">Learn by Adjusting Weights</h1>
+  <p class="hero-subtitle">Neural Networks — stacked layers of weighted sums and non-linearities</p>
+  <div class="scroll-indicator">↓</div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--stage-color);">1</div><h2 class="stage-title">The Problem</h2></div>
+    <p class="stage-description">A radiologist needs software that can spot tumours in X-rays. The features that distinguish tumour from tissue are complex, non-linear, and interact in ways no human can hand-engineer. Traditional ML needs those features given to it — neural networks learn the features themselves.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:8px;">
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:14px;text-align:center;"><div style="font-size:1.5rem;margin-bottom:6px;">📷</div><div style="font-size:0.85rem;font-weight:700;">Raw pixels</div><div style="font-size:0.8rem;color:var(--text-muted);">256×256 = 65,536 inputs</div></div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:14px;text-align:center;"><div style="font-size:1.5rem;margin-bottom:6px;">🧠</div><div style="font-size:0.85rem;font-weight:700;">Hidden layers</div><div style="font-size:0.8rem;color:var(--text-muted);">Learned features: edges, curves, shapes</div></div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:14px;text-align:center;"><div style="font-size:1.5rem;margin-bottom:6px;">🎯</div><div style="font-size:0.85rem;font-weight:700;">Prediction</div><div style="font-size:0.8rem;color:var(--text-muted);">Tumour: 87% confidence</div></div>
+    </div>
+    <div class="insight-box">"A neural network is just a function approximator. Given enough neurons, it can approximate any continuous function — this is the Universal Approximation Theorem."</div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-indigo);">2</div><h2 class="stage-title">The Intuition</h2></div>
+    <p class="stage-description">Each neuron computes a weighted sum of its inputs, adds a bias, then applies a non-linear activation. Stack several layers: the first layer detects simple patterns, the next combines them into complex ones. The network learns by backpropagating the error gradient from output to input, nudging weights in the direction that reduces error.</p>
+    <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px;">
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-sm);padding:14px;display:flex;align-items:center;gap:12px;"><div style="width:26px;height:26px;border-radius:50%;background:rgba(99,102,241,0.3);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;">1</div><div style="font-size:0.9rem;color:var(--text-secondary);"><strong>Forward pass</strong> — inputs flow left to right; each layer transforms the signal</div></div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-sm);padding:14px;display:flex;align-items:center;gap:12px;"><div style="width:26px;height:26px;border-radius:50%;background:rgba(99,102,241,0.4);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;">2</div><div style="font-size:0.9rem;color:var(--text-secondary);"><strong>Loss</strong> — compare prediction to label; compute error (MSE or cross-entropy)</div></div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-sm);padding:14px;display:flex;align-items:center;gap:12px;"><div style="width:26px;height:26px;border-radius:50%;background:rgba(99,102,241,0.6);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;">3</div><div style="font-size:0.9rem;color:var(--text-secondary);"><strong>Backprop</strong> — chain rule propagates ∂Loss/∂w through every layer</div></div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-sm);padding:14px;display:flex;align-items:center;gap:12px;"><div style="width:26px;height:26px;border-radius:50%;background:rgba(99,102,241,0.8);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;">4</div><div style="font-size:0.9rem;color:var(--text-secondary);"><strong>Gradient descent</strong> — weights updated: w ← w − η · ∂Loss/∂w</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-purple);">3</div><h2 class="stage-title">The Math</h2></div>
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;"><div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Single Neuron</div><code style="color:var(--stage-color);font-size:1rem;">z = w·x + b &nbsp;→&nbsp; a = σ(z)</code><p style="color:var(--text-muted);font-size:0.85rem;margin-top:6px;">σ is the activation function. Common choices: ReLU = max(0,z), sigmoid = 1/(1+e⁻ᶻ), tanh.</p></div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;"><div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Chain Rule (Backprop)</div><code style="color:var(--accent-indigo);font-size:1rem;">∂L/∂wₗ = ∂L/∂aₗ · ∂aₗ/∂zₗ · ∂zₗ/∂wₗ</code><p style="color:var(--text-muted);font-size:0.85rem;margin-top:6px;">Gradient flows backward; each layer gets its fair share of blame for the error.</p></div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:20px;"><div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">SGD Weight Update</div><code style="color:var(--accent-teal);font-size:1rem;">w ← w − η · (1/m) Σ ∂L/∂w</code><p style="color:var(--text-muted);font-size:0.85rem;margin-top:6px;">η = learning rate (typically 0.001–0.01). Adam adapts η per parameter.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-cyan);">🔬</div><h2 class="stage-title">Interactive Forward Pass</h2></div>
+    <p class="stage-description" style="margin-bottom:20px;">Drag the sliders to set two input values. Watch activations propagate through a 3-layer network (2→3→3→1). Brighter nodes = higher activation. The output is a sigmoid — drag inputs to see it tip toward 0 or 1.</p>
+    <div style="display:grid;grid-template-columns:220px 1fr;gap:24px;align-items:start;">
+      <div>
+        <div style="font-size:0.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;">Input values</div>
+        <div id="sliderArea"></div>
+        <div style="margin-top:20px;padding:14px;background:rgba(99,102,241,0.1);border-radius:var(--radius-md);text-align:center;">
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">Output (sigmoid)</div>
+          <div id="outputVal" style="font-size:2rem;font-weight:800;color:var(--stage-color);">0.50</div>
+          <div id="outputLabel" style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">Neutral</div>
+        </div>
+      </div>
+      <div>
+        <canvas id="nnDemo" width="400" height="260" style="width:100%;border-radius:var(--radius-md);background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);"></canvas>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-violet);">4</div><h2 class="stage-title">Assumptions &amp; Pitfalls</h2></div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;"><strong>Vanishing gradients.</strong> <span style="color:var(--text-secondary);">In deep sigmoid networks, gradients shrink to near zero in early layers — they stop learning. Fix: use ReLU activations or batch normalisation.</span></div>
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;"><strong>Overfitting on small data.</strong> <span style="color:var(--text-secondary);">A large network can memorise training data perfectly. Use dropout, L2 regularisation, and early stopping.</span></div>
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;"><strong>Hyperparameter sensitivity.</strong> <span style="color:var(--text-secondary);">Learning rate is the most critical. Too high = divergence. Too low = slow convergence. Use Adam with lr=1e-3 as a safe default.</span></div>
+      <div style="padding:16px 20px;background:rgba(251,113,133,0.08);border-left:3px solid var(--accent-rose);border-radius:0 var(--radius-sm) var(--radius-sm) 0;"><strong>Data requirements.</strong> <span style="color:var(--text-secondary);">Deep networks need large labelled datasets. With &lt;1000 examples, tree-based methods or SVMs often win.</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <div class="stage-container glass-card reveal">
+    <div class="stage-header"><div class="stage-badge" style="background:var(--accent-teal);">5</div><h2 class="stage-title">When to Use</h2></div>
+    <div class="pros-cons">
+      <div class="pros-cons-col pros-col"><h4>Strengths</h4><ul><li>Learns features automatically from raw data</li><li>Scales with data and compute</li><li>State-of-the-art on images, text, audio</li><li>Transfer learning: fine-tune pre-trained models</li></ul></div>
+      <div class="pros-cons-col cons-col"><h4>Limitations</h4><ul><li>Needs large labelled datasets</li><li>Compute intensive to train</li><li>Black box — low interpretability</li><li>Overkill for structured/tabular data</li></ul></div>
+    </div>
+    <div class="use-case-tags">
+      <span class="use-case-tag">Image recognition</span>
+      <span class="use-case-tag">Natural language processing</span>
+      <span class="use-case-tag">Speech recognition</span>
+      <span class="use-case-tag">Recommendation systems</span>
+      <span class="use-case-tag">Game playing (RL)</span>
+    </div>
+  </div>
+</section>
+
+<section class="section section-compact">
+  <h2 class="section-title reveal">Key Takeaways</h2>
+  <div class="takeaways-grid">
+    <div class="glass-card takeaway-card reveal reveal-delay-1"><span class="takeaway-icon" style="color:var(--stage-color);">⚡</span><h4>ReLU + Adam is the Default</h4><p>Start with ReLU activations and Adam optimiser (lr=0.001). This combination works well across a wide range of architectures.</p></div>
+    <div class="glass-card takeaway-card reveal reveal-delay-2"><span class="takeaway-icon" style="color:var(--accent-indigo);">🔁</span><h4>Backprop is Just Chain Rule</h4><p>The magic of deep learning is that gradients chain together. Automatic differentiation handles this — you define the forward pass; the framework handles the rest.</p></div>
+    <div class="glass-card takeaway-card reveal reveal-delay-3"><span class="takeaway-icon" style="color:var(--accent-teal);">📦</span><h4>Transfer Learning First</h4><p>Don't train from scratch if a pre-trained model exists. Fine-tune the last layers on your data. 10× faster, far fewer data required.</p></div>
+  </div>
+</section>
+
+<nav class="nav-bar reveal">
+  <a href="model-selection.html" style="color:var(--text-secondary);text-decoration:none;font-size:0.95rem;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">← Model Selection</a>
+  <a href="CNN/index.html" style="color:var(--text-secondary);text-decoration:none;font-size:0.95rem;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">CNN →</a>
+</nav>
+<footer class="footer">Built for IIITB Deep Learning Course · 2026</footer>
+
+<script>
+(function(){
+
+  // ── Hero animation: pulsing network ──────────────────────────────────────
+  var hc = document.getElementById('nnHero');
+  var hctx = hc.getContext('2d');
+  var HW = hc.width, HH = hc.height;
+  var heroLayers = [[HW*0.12,[HH*0.35,HH*0.65]],[HW*0.35,[HH*0.2,HH*0.45,HH*0.7]],[HW*0.62,[HH*0.2,HH*0.45,HH*0.7]],[HW*0.85,[HH*0.5]]];
+  var pulse = 0;
+
+  function drawHero(p) {
+    hctx.clearRect(0,0,HW,HH);
+    // Draw connections
+    for(var l=0;l<heroLayers.length-1;l++){
+      heroLayers[l][1].forEach(function(y1){
+        heroLayers[l+1][1].forEach(function(y2){
+          var alpha = 0.06 + 0.1*Math.sin(p + l);
+          hctx.strokeStyle = 'rgba(99,102,241,'+alpha+')';
+          hctx.lineWidth = 1;
+          hctx.beginPath(); hctx.moveTo(heroLayers[l][0],y1); hctx.lineTo(heroLayers[l+1][0],y2); hctx.stroke();
+        });
+      });
+    }
+    // Draw nodes
+    heroLayers.forEach(function(layer, li){
+      layer[1].forEach(function(y, ni){
+        var activation = 0.3 + 0.7*Math.max(0, Math.sin(p - li*0.8 - ni*0.3));
+        var r = 10;
+        // glow
+        var grd = hctx.createRadialGradient(layer[0],y,0,layer[0],y,r*2);
+        grd.addColorStop(0,'rgba(99,102,241,'+(activation*0.4)+')');
+        grd.addColorStop(1,'rgba(99,102,241,0)');
+        hctx.fillStyle = grd;
+        hctx.beginPath(); hctx.arc(layer[0],y,r*2,0,Math.PI*2); hctx.fill();
+        // node
+        hctx.beginPath(); hctx.arc(layer[0],y,r,0,Math.PI*2);
+        hctx.fillStyle = 'rgba(99,102,241,'+(0.2+activation*0.7)+')';
+        hctx.fill();
+        hctx.strokeStyle = 'rgba(99,102,241,'+(0.3+activation*0.5)+')';
+        hctx.lineWidth = 1.5; hctx.stroke();
+      });
+    });
+  }
+  setInterval(function(){ pulse += 0.06; drawHero(pulse); }, 40);
+
+  // ── Interactive Demo ──────────────────────────────────────────────────────
+  var WEIGHTS = {
+    w1: [[ 0.8, -0.5,  0.3],[ 0.2,  0.9, -0.7]],  // 2x3 (input→h1)
+    b1: [0.1, -0.1, 0.2],
+    w2: [[ 0.6, -0.4,  0.5],[ 0.3,  0.7, -0.3],[-0.5,  0.2,  0.8]], // 3x3 (h1→h2)
+    b2: [-0.2, 0.1, 0.3],
+    w3: [0.7, -0.6, 0.5],  // 3x1 (h2→out)
+    b3: -0.1
+  };
+
+  function relu(x){ return Math.max(0,x); }
+  function sigmoid(x){ return 1/(1+Math.exp(-x)); }
+
+  function forward(inputs) {
+    var h1 = WEIGHTS.b1.map(function(b,j){
+      return relu(inputs.reduce(function(s,x,i){ return s + x*WEIGHTS.w1[i][j]; },0) + b);
+    });
+    var h2 = WEIGHTS.b2.map(function(b,j){
+      return relu(h1.reduce(function(s,x,i){ return s + x*WEIGHTS.w2[i][j]; },0) + b);
+    });
+    var z3 = h2.reduce(function(s,x,i){ return s + x*WEIGHTS.w3[i]; },0) + WEIGHTS.b3;
+    var out = sigmoid(z3);
+    return {h1:h1, h2:h2, out:out};
+  }
+
+  // Sliders
+  var sliderArea = document.getElementById('sliderArea');
+  var inputs = [0.5, 0.5];
+  var inputLabels = ['x₁','x₂'];
+
+  inputLabels.forEach(function(lbl, i){
+    var row = document.createElement('div');
+    row.className = 'nn-slider-row';
+    var label = document.createElement('label');
+    label.textContent = lbl;
+    var slider = document.createElement('input');
+    slider.type = 'range'; slider.min = '0'; slider.max = '1'; slider.step = '0.01'; slider.value = '0.5';
+    var valSpan = document.createElement('span');
+    valSpan.className = 'val';
+    valSpan.textContent = '0.50';
+    slider.addEventListener('input', function(){
+      inputs[i] = parseFloat(this.value);
+      valSpan.textContent = parseFloat(this.value).toFixed(2);
+      renderDemo();
+    });
+    row.appendChild(label); row.appendChild(slider); row.appendChild(valSpan);
+    sliderArea.appendChild(row);
+  });
+
+  // Demo canvas
+  var dc = document.getElementById('nnDemo');
+  var dctx = dc.getContext('2d');
+  var DW = dc.width, DH = dc.height;
+
+  // Layer x positions, node y positions
+  var demoLayers = [
+    {x: DW*0.10, nodes: [DH*0.35, DH*0.65]},
+    {x: DW*0.37, nodes: [DH*0.22, DH*0.50, DH*0.78]},
+    {x: DW*0.63, nodes: [DH*0.22, DH*0.50, DH*0.78]},
+    {x: DW*0.88, nodes: [DH*0.50]}
+  ];
+  var layerLabels = ['Input','Hidden 1\n(ReLU)','Hidden 2\n(ReLU)','Output\n(σ)'];
+
+  function nodeColor(a) {
+    var r = Math.round(99 + (163-99)*a);
+    var g = Math.round(102 + (230-102)*a);
+    var b = 241;
+    return 'rgb('+r+','+g+','+b+')';
+  }
+
+  function renderDemo() {
+    var result = forward(inputs);
+    var allActs = [inputs, result.h1, result.h2, [result.out]];
+
+    dctx.clearRect(0,0,DW,DH);
+
+    // Connections
+    for(var l=0;l<demoLayers.length-1;l++){
+      demoLayers[l].nodes.forEach(function(y1, ni){
+        demoLayers[l+1].nodes.forEach(function(y2, nj){
+          var a1 = allActs[l][ni] || 0;
+          var a2 = allActs[l+1][nj] || 0;
+          var strength = (a1+a2)/2;
+          dctx.strokeStyle = 'rgba(99,102,241,'+(0.05+strength*0.3)+')';
+          dctx.lineWidth = 0.5 + strength*1.5;
+          dctx.beginPath(); dctx.moveTo(demoLayers[l].x,y1); dctx.lineTo(demoLayers[l+1].x,y2); dctx.stroke();
+        });
+      });
+    }
+
+    // Nodes
+    demoLayers.forEach(function(layer, li){
+      layer.nodes.forEach(function(y, ni){
+        var a = allActs[li][ni] || 0;
+        var r = 12;
+        // glow
+        var grd = dctx.createRadialGradient(layer.x,y,0,layer.x,y,r*2.5);
+        grd.addColorStop(0,'rgba(99,102,241,'+(a*0.5)+')');
+        grd.addColorStop(1,'rgba(99,102,241,0)');
+        dctx.fillStyle = grd;
+        dctx.beginPath(); dctx.arc(layer.x,y,r*2.5,0,Math.PI*2); dctx.fill();
+        // circle
+        dctx.beginPath(); dctx.arc(layer.x,y,r,0,Math.PI*2);
+        dctx.fillStyle = nodeColor(a);
+        dctx.globalAlpha = 0.25 + a*0.75;
+        dctx.fill();
+        dctx.globalAlpha = 1;
+        dctx.strokeStyle = nodeColor(a);
+        dctx.lineWidth = 1.5; dctx.stroke();
+        // activation label
+        dctx.fillStyle = 'rgba(255,255,255,0.6)';
+        dctx.font = '10px system-ui';
+        dctx.textAlign = 'center';
+        dctx.fillText(a.toFixed(2), layer.x, y+r+12);
+      });
+    });
+
+    // Layer labels
+    dctx.textAlign = 'center';
+    demoLayers.forEach(function(layer, li){
+      var lines = layerLabels[li].split('\n');
+      dctx.fillStyle = 'rgba(255,255,255,0.25)';
+      dctx.font = '10px system-ui';
+      lines.forEach(function(line, idx){
+        dctx.fillText(line, layer.x, DH - 18 + idx*12);
+      });
+    });
+
+    // Output display
+    var out = result.out;
+    document.getElementById('outputVal').textContent = out.toFixed(3);
+    var lbl = out > 0.7 ? 'Class 1 (confident)' : out > 0.5 ? 'Class 1 (lean)' : out > 0.3 ? 'Class 0 (lean)' : 'Class 0 (confident)';
+    document.getElementById('outputLabel').textContent = lbl;
+  }
+
+  renderDemo();
+
+  // Scroll reveal
+  var obs = new IntersectionObserver(function(entries){ entries.forEach(function(e){ if(e.isIntersecting) e.target.classList.add('visible'); }); }, {threshold:0.12});
+  document.querySelectorAll('.reveal').forEach(function(el){ obs.observe(el); });
+})();
+</script>
+</body>
+</html>
