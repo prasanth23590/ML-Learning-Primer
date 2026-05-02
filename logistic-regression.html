@@ -112,8 +112,8 @@ body::before { content: ''; position: fixed; inset: 0; background: radial-gradie
       </div>
       <div class="stage-visual">
         <div style="display:flex;flex-direction:column;gap:8px;width:100%;max-width:220px;padding:16px;">
-          <div style="background:rgba(251,113,133,0.15);border-radius:var(--radius-sm);padding:8px 12px;font-size:0.85rem;color:var(--accent-rose);">😤 Churned — 15% of customers</div>
-          <div style="background:rgba(20,184,166,0.15);border-radius:var(--radius-sm);padding:8px 12px;font-size:0.85rem;color:var(--accent-teal);">😊 Stayed — 85% of customers</div>
+          <div style="background:rgba(251,113,133,0.15);border-radius:var(--radius-sm);padding:8px 12px;font-size:0.85rem;color:var(--accent-rose);display:flex;align-items:center;gap:8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Churned — 15% of customers</div>
+          <div style="background:rgba(20,184,166,0.15);border-radius:var(--radius-sm);padding:8px 12px;font-size:0.85rem;color:var(--accent-teal);display:flex;align-items:center;gap:8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Stayed — 85% of customers</div>
           <div style="margin-top:8px;font-size:0.8rem;color:var(--text-muted);">Class imbalance — a key challenge</div>
         </div>
       </div>
@@ -140,7 +140,7 @@ body::before { content: ''; position: fixed; inset: 0; background: radial-gradie
 <section class="section section-compact">
   <div class="stage-container glass-card reveal" style="max-width:700px;">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-      <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#f59e0b,#fb7185);display:flex;align-items:center;justify-content:center;font-size:16px;">⚡</div>
+      <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#f59e0b,#fb7185);display:flex;align-items:center;justify-content:center;font-size:16px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
       <h2 style="font-size:1.5rem;font-weight:700;">Interactive Demo</h2>
     </div>
     <p style="color:var(--text-secondary);margin-bottom:20px;font-size:0.95rem;">Adjust the classification threshold and watch the confusion matrix update. Default 0.5 isn't always optimal — lower the threshold to catch more churners (at the cost of more false alarms).</p>
@@ -258,17 +258,17 @@ body::before { content: ''; position: fixed; inset: 0; background: radial-gradie
   <h2 class="section-title reveal">Key Takeaways</h2>
   <div class="takeaways-grid">
     <div class="glass-card takeaway-card reveal reveal-delay-1">
-      <span class="takeaway-icon" style="color:var(--accent-indigo);">🌡️</span>
+      <span class="takeaway-icon" style="color:var(--accent-indigo);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg></span>
       <h4>Sigmoid Squashes to Probability</h4>
       <p>Any linear combination of features gets mapped to (0,1) — interpretable as the probability of the positive class.</p>
     </div>
     <div class="glass-card takeaway-card reveal reveal-delay-2">
-      <span class="takeaway-icon" style="color:var(--accent-purple);">🎚️</span>
+      <span class="takeaway-icon" style="color:var(--accent-purple);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></span>
       <h4>Threshold is a Business Decision</h4>
       <p>Default 0.5 isn't always right. A healthcare model should recall most positives even at the cost of false alarms.</p>
     </div>
     <div class="glass-card takeaway-card reveal reveal-delay-3">
-      <span class="takeaway-icon" style="color:var(--accent-cyan);">📈</span>
+      <span class="takeaway-icon" style="color:var(--accent-cyan);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>
       <h4>AUC-ROC Summarises All Thresholds</h4>
       <p>AUC = 1 is perfect; AUC = 0.5 is random. Use it to compare models independent of threshold.</p>
     </div>

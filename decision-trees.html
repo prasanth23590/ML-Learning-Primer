@@ -124,12 +124,12 @@ chol &gt; 240:
     <p class="stage-description">At each node, the tree asks: "Which feature and threshold, if I split on it right now, creates the purest possible child groups?" It greedily picks the best split, then recurses on each child.</p>
     <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px;">
       <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:16px;text-align:center;">
-        <div style="font-size:2rem;margin-bottom:8px;">🎲</div>
+        <div style="font-size:2rem;margin-bottom:8px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M16 8h.01M8 8h.01M12 12h.01M16 16h.01M8 16h.01"/></svg></div>
         <div style="font-weight:700;font-size:0.9rem;margin-bottom:4px;">Impure Node</div>
         <div style="font-size:0.82rem;color:var(--text-muted);">Mixed classes — hard to make a decision</div>
       </div>
       <div style="background:rgba(255,255,255,0.03);border-radius:var(--radius-md);padding:16px;text-align:center;">
-        <div style="font-size:2rem;margin-bottom:8px;">✅</div>
+        <div style="font-size:2rem;margin-bottom:8px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div style="font-weight:700;font-size:0.9rem;margin-bottom:4px;">Pure Leaf</div>
         <div style="font-size:0.82rem;color:var(--text-muted);">All examples of one class — decision made</div>
       </div>
@@ -141,7 +141,7 @@ chol &gt; 240:
 <section class="section section-compact">
   <div class="stage-container glass-card reveal" style="max-width:700px;">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-      <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#f59e0b,#fb7185);display:flex;align-items:center;justify-content:center;font-size:16px;">⚡</div>
+      <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#f59e0b,#fb7185);display:flex;align-items:center;justify-content:center;font-size:16px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
       <h2 style="font-size:1.5rem;font-weight:700;">Interactive Demo — Classify a Patient</h2>
     </div>
     <p style="color:var(--text-secondary);margin-bottom:20px;font-size:0.9rem;">Answer each question to traverse the decision tree.</p>
@@ -206,17 +206,17 @@ chol &gt; 240:
   <h2 class="section-title reveal">Key Takeaways</h2>
   <div class="takeaways-grid">
     <div class="glass-card takeaway-card reveal reveal-delay-1">
-      <span class="takeaway-icon" style="color:var(--stage-color);">🌳</span>
+      <span class="takeaway-icon" style="color:var(--stage-color);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
       <h4>Splits by Purity</h4>
       <p>Every split is chosen to maximise information gain or minimise Gini impurity — a measure of how mixed the classes are.</p>
     </div>
     <div class="glass-card takeaway-card reveal reveal-delay-2">
-      <span class="takeaway-icon" style="color:var(--accent-amber);">✂️</span>
+      <span class="takeaway-icon" style="color:var(--accent-amber);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
       <h4>Prune to Generalise</h4>
       <p>max_depth and min_samples_leaf are the most important hyperparameters. Start shallow and add depth only if validation improves.</p>
     </div>
     <div class="glass-card takeaway-card reveal reveal-delay-3">
-      <span class="takeaway-icon" style="color:var(--accent-cyan);">🧱</span>
+      <span class="takeaway-icon" style="color:var(--accent-cyan);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="10" x2="6" y2="14"/><line x1="10" y1="10" x2="10" y2="14"/><line x1="14" y1="10" x2="14" y2="14"/><line x1="18" y1="10" x2="18" y2="14"/></svg></span>
       <h4>Building Block of Ensembles</h4>
       <p>A single tree is weak but interpretable. Combine 100 trees in Random Forest or Boosting for state-of-the-art accuracy.</p>
     </div>
@@ -235,17 +235,17 @@ chol &gt; 240:
     q: 'Is the patient older than 55?',
     yes: {
       q: 'Is chest pain "typical angina"?',
-      yes: { leaf: true, label: 'HIGH RISK', emoji: '🔴', color: '#fb7185', path: 'Age > 55 → Chest pain = typical' },
+      yes: { leaf: true, label: 'HIGH RISK', icon: '▲', color: '#fb7185', path: 'Age > 55 → Chest pain = typical' },
       no: {
         q: 'Is cholesterol > 240 mg/dL?',
-        yes: { leaf: true, label: 'HIGH RISK', emoji: '🔴', color: '#fb7185', path: 'Age > 55 → No typical pain → Chol > 240' },
-        no: { leaf: true, label: 'MEDIUM RISK', emoji: '🟡', color: '#f59e0b', path: 'Age > 55 → No typical pain → Chol ≤ 240' }
+        yes: { leaf: true, label: 'HIGH RISK', icon: '▲', color: '#fb7185', path: 'Age > 55 → No typical pain → Chol > 240' },
+        no: { leaf: true, label: 'MEDIUM RISK', icon: '◆', color: '#f59e0b', path: 'Age > 55 → No typical pain → Chol ≤ 240' }
       }
     },
     no: {
       q: 'Is resting heart rate > 130 bpm?',
-      yes: { leaf: true, label: 'MEDIUM RISK', emoji: '🟡', color: '#f59e0b', path: 'Age ≤ 55 → HR > 130' },
-      no: { leaf: true, label: 'LOW RISK', emoji: '🟢', color: '#14b8a6', path: 'Age ≤ 55 → HR ≤ 130' }
+      yes: { leaf: true, label: 'MEDIUM RISK', icon: '◆', color: '#f59e0b', path: 'Age ≤ 55 → HR > 130' },
+      no: { leaf: true, label: 'LOW RISK', icon: '●', color: '#14b8a6', path: 'Age ≤ 55 → HR ≤ 130' }
     }
   };
 
@@ -267,7 +267,7 @@ chol &gt; 240:
     while (btnsEl.firstChild) btnsEl.removeChild(btnsEl.firstChild);
     if (cur.leaf) {
       qEl.style.color = cur.color;
-      qEl.textContent = cur.emoji + ' ' + cur.label;
+      qEl.textContent = cur.icon + ' ' + cur.label;
       pathEl.textContent = 'Path: ' + cur.path;
     } else {
       qEl.style.color = 'white';
