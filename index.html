@@ -112,11 +112,8 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 14px;
-  color: white;
   flex-shrink: 0;
+  overflow: hidden;
 }
 
 .logo-text {
@@ -627,7 +624,11 @@ body::before {
 <!-- Sidebar -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo">
-    <div class="logo-mark">ML</div>
+    <div class="logo-mark">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 15V5L7.5 11.5L10 8L12.5 11.5L17 5V15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
     <div>
       <div class="logo-text">ML Learning Primer</div>
       <div class="logo-sub">Deep Learning · 2026</div>
@@ -718,7 +719,7 @@ body::before {
     </div>
     <div class="topbar-actions">
       <a href="eda.html" class="topbar-btn">Start Learning →</a>
-      <a href="https://github.com/prasanth23590/ML-Learning-Primer" target="_blank" class="topbar-btn topbar-btn-primary">GitHub</a>
+      <a href="https://github.com/prasanth23590/ML-Learning-Primer" target="_blank" rel="noopener noreferrer" class="topbar-btn topbar-btn-primary">GitHub</a>
     </div>
   </header>
 
@@ -962,7 +963,7 @@ body::before {
 <!-- Footer -->
 <footer class="site-footer">
   <span>ML Learning Primer · 2026</span>
-  <a href="https://github.com/prasanth23590/ML-Learning-Primer" target="_blank" class="footer-link">GitHub →</a>
+  <a href="https://github.com/prasanth23590/ML-Learning-Primer" target="_blank" rel="noopener noreferrer" class="footer-link">GitHub →</a>
 </footer>
 
 <!-- Phase nav dots -->
