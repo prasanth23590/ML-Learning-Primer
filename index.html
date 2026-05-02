@@ -3,530 +3,1029 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IIITB — ML & DL Learning Path</title>
+<title>ML Learning Primer — IIITB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 
 :root {
-  --bg-deep: #0a1020;
-  --bg-mid: #0f1628;
-  --bg-light: #1a2a4a;
-  --bg-accent: #1e3a5f;
-  --glass-bg: rgba(255,255,255,0.04);
+  --bg: #07090f;
+  --bg-1: #0c1018;
+  --bg-2: #111623;
+  --surface: rgba(255,255,255,0.038);
+  --surface-hover: rgba(255,255,255,0.065);
+  --border: rgba(255,255,255,0.075);
+  --border-hover: rgba(255,255,255,0.16);
+  --text: #f0f2f8;
+  --text-2: rgba(240,242,248,0.65);
+  --text-3: rgba(240,242,248,0.38);
+  --blue: #3b82f6;
+  --blue-dim: rgba(59,130,246,0.18);
+  --indigo: #6366f1;
+  --purple: #8b5cf6;
+  --cyan: #06b6d4;
+  --teal: #14b8a6;
+  --amber: #f59e0b;
+  --rose: #fb7185;
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+  /* Liquid glass */
+  --glass: rgba(255,255,255,0.045);
   --glass-border: rgba(255,255,255,0.10);
-  --glass-border-hover: rgba(255,255,255,0.18);
-  --text-primary: #ffffff;
-  --text-secondary: rgba(255,255,255,0.7);
-  --text-muted: rgba(255,255,255,0.45);
-  --accent-blue: #3b82f6;
-  --accent-indigo: #6366f1;
-  --accent-purple: #8b5cf6;
-  --accent-violet: #a78bfa;
-  --accent-cyan: #06b6d4;
-  --accent-teal: #14b8a6;
-  --accent-amber: #f59e0b;
-  --accent-rose: #fb7185;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
+  --glass-shine: rgba(255,255,255,0.07);
+  --blur: blur(20px) saturate(1.4);
 }
 
 html { scroll-behavior: smooth; }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  background: var(--bg-deep);
-  color: var(--text-primary);
-  line-height: 1.6;
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.65;
   overflow-x: hidden;
+  min-height: 100vh;
 }
 
+/* ── Ambient light background ── */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse at 20% 20%, rgba(59,130,246,0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 80%, rgba(139,92,246,0.06) 0%, transparent 50%),
-    linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-mid) 30%, var(--bg-light) 70%, var(--bg-accent) 100%);
-  z-index: -1;
+    radial-gradient(ellipse 70% 50% at 15% 10%, rgba(59,130,246,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 60% at 85% 85%, rgba(139,92,246,0.06) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 40% at 60% 30%, rgba(6,182,212,0.04) 0%, transparent 50%),
+    linear-gradient(160deg, #07090f 0%, #0c1018 40%, #0e1422 70%, #111826 100%);
+  z-index: -2;
+  pointer-events: none;
 }
 
-.reveal {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
-}
-.reveal.visible { opacity: 1; transform: translateY(0); }
-.reveal-delay-1 { transition-delay: 0.1s; }
-.reveal-delay-2 { transition-delay: 0.2s; }
-.reveal-delay-3 { transition-delay: 0.3s; }
-
-/* HERO */
-.hero {
+/* ── Layout shell ── */
+.shell {
+  display: grid;
+  grid-template-columns: 260px 1fr;
   min-height: 100vh;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 260px;
+  height: 100vh;
+  overflow-y: auto;
+  background: rgba(7,9,15,0.6);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
+  z-index: 100;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+.sidebar-logo {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.logo-mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--blue), var(--indigo));
+  display: flex;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  padding: 80px 40px;
-  position: relative;
-}
-
-.hero-pixel-grid {
-  display: grid;
-  grid-template-columns: repeat(14, 1fr);
-  gap: 3px;
-  width: 280px;
-  height: 140px;
-  margin: 0 auto 48px;
-}
-
-.hero-pixel-cell {
-  border-radius: 3px;
-  animation: pixelPulse 3s ease-in-out infinite;
-  animation-delay: var(--delay);
-}
-
-@keyframes pixelPulse {
-  0%, 100% { opacity: 0.3; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.05); }
-}
-
-.hero-badge {
-  display: inline-block;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--accent-cyan);
-  border: 1px solid rgba(6,182,212,0.3);
-  border-radius: 999px;
-  padding: 6px 16px;
-  margin-bottom: 24px;
-}
-
-.hero-title {
-  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-family: 'Syne', sans-serif;
   font-weight: 800;
-  letter-spacing: -0.02em;
-  margin-bottom: 16px;
-  background: linear-gradient(135deg, #ffffff 0%, rgba(255,255,255,0.8) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: 14px;
+  color: white;
+  flex-shrink: 0;
 }
 
-.hero-subtitle {
-  font-size: clamp(1rem, 2vw, 1.2rem);
-  color: var(--text-secondary);
-  margin-bottom: 48px;
-}
-
-.scroll-indicator {
-  position: absolute;
-  bottom: 40px;
-  left: 50%;
-  transform: translateX(-50%);
-  animation: bounce 2s infinite;
-  color: var(--text-muted);
-  font-size: 24px;
-}
-
-@keyframes bounce {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(10px); }
-}
-
-/* PHASE PILLS */
-.phase-pills-section {
-  padding: 48px 40px 32px;
-  display: flex;
-  justify-content: center;
-}
-
-.phase-pills {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.phase-pill {
-  padding: 8px 20px;
-  border-radius: 999px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: default;
-  border: 1px solid transparent;
-  transition: transform 0.2s;
-}
-
-.phase-pill:hover { transform: translateY(-2px); }
-
-.phase-pill-1 {
-  background: rgba(59,130,246,0.12);
-  border-color: rgba(59,130,246,0.3);
-  color: var(--accent-blue);
-}
-
-.phase-pill-2 {
-  background: rgba(139,92,246,0.12);
-  border-color: rgba(139,92,246,0.3);
-  color: var(--accent-purple);
-}
-
-.phase-pill-3 {
-  background: rgba(6,182,212,0.12);
-  border-color: rgba(6,182,212,0.3);
-  color: var(--accent-cyan);
-}
-
-/* ROADMAP */
-.roadmap-section {
-  padding: 24px 40px 80px;
-  max-width: 760px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-.phase-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 40px 0 20px;
-}
-
-.phase-label {
-  font-size: 0.75rem;
+.logo-text {
+  font-family: 'Syne', sans-serif;
   font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.logo-sub {
+  font-size: 0.7rem;
+  color: var(--text-3);
+  font-weight: 400;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.sidebar-nav { padding: 16px 12px; flex: 1; }
+
+.nav-group { margin-bottom: 24px; }
+
+.nav-group-label {
+  font-size: 0.68rem;
+  font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  padding: 4px 12px;
-  border-radius: 999px;
+  color: var(--text-3);
+  padding: 0 8px;
+  margin-bottom: 6px;
 }
 
-.phase-label-1 { background: rgba(59,130,246,0.15); color: var(--accent-blue); }
-.phase-label-2 { background: rgba(139,92,246,0.15); color: var(--accent-purple); }
-.phase-label-3 { background: rgba(6,182,212,0.15); color: var(--accent-cyan); }
-
-.phase-line { flex: 1; height: 1px; background: rgba(255,255,255,0.06); }
-
-/* Topic cards with connecting line */
-.roadmap-track { position: relative; }
-
-.roadmap-track::before {
-  content: '';
-  position: absolute;
-  left: 20px;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.03) 100%);
-}
-
-.topic-card {
+.nav-item {
   display: flex;
   align-items: center;
-  gap: 20px;
-  padding: 20px 24px;
-  margin-bottom: 12px;
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
+  gap: 10px;
+  padding: 7px 8px;
+  border-radius: var(--r-sm);
+  font-size: 0.875rem;
+  color: var(--text-2);
   text-decoration: none;
-  color: inherit;
-  position: relative;
-  transition: border-color 0.3s, transform 0.3s, background 0.3s;
-  z-index: 1;
+  transition: background 0.15s, color 0.15s;
+  cursor: pointer;
 }
 
-.topic-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+.nav-item:hover {
+  background: var(--surface-hover);
+  color: var(--text);
 }
 
-.topic-card:hover {
-  border-color: var(--glass-border-hover);
-  transform: translateX(6px);
-  background: rgba(255,255,255,0.06);
+.nav-item.active {
+  background: var(--blue-dim);
+  color: var(--blue);
 }
 
-.topic-num {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-sm);
+.nav-num {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
+  font-size: 0.65rem;
   font-weight: 700;
   flex-shrink: 0;
   color: white;
 }
 
+.sidebar-footer {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  font-size: 0.75rem;
+  color: var(--text-3);
+  flex-shrink: 0;
+}
+
+/* ── Main content ── */
+.main {
+  margin-left: 260px;
+  min-height: 100vh;
+}
+
+/* ── Top bar ── */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(7,9,15,0.75);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border-bottom: 1px solid var(--border);
+  padding: 0 48px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.topbar-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-3);
+}
+
+.topbar-breadcrumb span { color: var(--text-2); }
+
+.topbar-actions { display: flex; align-items: center; gap: 8px; }
+
+.topbar-btn {
+  padding: 6px 14px;
+  border-radius: var(--r-sm);
+  font-size: 0.8rem;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-2);
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.topbar-btn:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-hover);
+  color: var(--text);
+}
+
+.topbar-btn-primary {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: white;
+}
+
+.topbar-btn-primary:hover {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: white;
+}
+
+/* ── Hero ── */
+.hero {
+  padding: 72px 48px 56px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -80px;
+  right: -80px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(59,130,246,0.06) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 20px;
+}
+
+.hero-eyebrow-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cyan);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.7); }
+}
+
+.hero-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2.8rem, 5vw, 4.2rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin-bottom: 20px;
+}
+
+.hero-title-gradient {
+  background: linear-gradient(135deg, #ffffff 0%, rgba(255,255,255,0.75) 50%, rgba(99,102,241,0.9) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-desc {
+  font-size: 1.1rem;
+  color: var(--text-2);
+  max-width: 560px;
+  margin-bottom: 36px;
+  line-height: 1.7;
+  font-weight: 300;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.stat-label {
+  font-size: 0.78rem;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+}
+
+.hero-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  margin: 48px 0 0;
+}
+
+/* ── Content area ── */
+.content { padding: 0 48px 80px; }
+
+/* ── Phase sections ── */
+.phase-section { margin-bottom: 48px; padding-top: 40px; }
+
+.phase-heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.phase-tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.p1-tag { background: rgba(59,130,246,0.14); color: #60a5fa; border: 1px solid rgba(59,130,246,0.2); }
+.p2-tag { background: rgba(139,92,246,0.14); color: #a78bfa; border: 1px solid rgba(139,92,246,0.2); }
+.p3-tag { background: rgba(6,182,212,0.14); color: #67e8f9; border: 1px solid rgba(6,182,212,0.2); }
+
+.phase-rule { flex: 1; height: 1px; background: var(--border); }
+
+/* ── Topic cards — liquid glass ── */
+.topic-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.topic-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 22px;
+  background: var(--glass);
+  backdrop-filter: blur(16px) saturate(1.3);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-md);
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.25s, background 0.25s, transform 0.25s;
+}
+
+/* Liquid glass shine layer */
+.topic-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--glass-shine) 0%, transparent 50%);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* Top edge highlight */
+.topic-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 12px; right: 12px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  pointer-events: none;
+}
+
+.topic-card:hover {
+  border-color: var(--border-hover);
+  background: rgba(255,255,255,0.07);
+  transform: translateX(4px) translateY(-1px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.topic-num {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 800;
+  flex-shrink: 0;
+  color: white;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* glass reflection on num badge */
+.topic-num::after {
+  content: '';
+  position: absolute;
+  top: 1px; left: 3px; right: 3px;
+  height: 40%;
+  background: rgba(255,255,255,0.2);
+  border-radius: 4px 4px 50% 50%;
+  pointer-events: none;
+}
+
 .topic-body { flex: 1; min-width: 0; }
 
 .topic-name {
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 0.95rem;
+  font-weight: 600;
   margin-bottom: 3px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
 }
 
 .topic-tagline {
-  font-size: 0.85rem;
-  color: var(--text-muted);
+  font-size: 0.8rem;
+  color: var(--text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.topic-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.topic-type-badge {
+  font-size: 0.67rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.06);
+  color: var(--text-3);
+  border: 1px solid rgba(255,255,255,0.07);
+  white-space: nowrap;
 }
 
 .topic-arrow {
-  color: var(--text-muted);
-  font-size: 18px;
-  transition: color 0.3s, transform 0.3s;
+  color: var(--text-3);
+  font-size: 16px;
+  transition: color 0.2s, transform 0.2s;
+  flex-shrink: 0;
 }
 
 .topic-card:hover .topic-arrow {
-  color: var(--text-secondary);
-  transform: translateX(4px);
+  color: var(--text);
+  transform: translateX(3px);
 }
 
-/* Phase color schemes */
-.num-p1-1 { background: linear-gradient(135deg, #3b82f6, #6366f1); }
-.num-p1-2 { background: linear-gradient(135deg, #4f90f8, #7071f2); }
-.num-p1-3 { background: linear-gradient(135deg, #6366f1, #8176f4); }
-.num-p1-4 { background: linear-gradient(135deg, #7270f2, #8e82f5); }
-.num-p1-5 { background: linear-gradient(135deg, #8176f4, #9a8ef6); }
-.num-p2-1 { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }
-.num-p2-2 { background: linear-gradient(135deg, #9868f8, #b59bfb); }
-.num-p2-3 { background: linear-gradient(135deg, #a678fa, #c2a9fb); }
-.num-p2-4 { background: linear-gradient(135deg, #b48bfb, #d4bffc); }
-.num-p2-5 { background: linear-gradient(135deg, #c09cfc, #e0cefd); }
-.num-p3-1 { background: linear-gradient(135deg, #06b6d4, #14b8a6); }
-.num-p3-2 { background: linear-gradient(135deg, #0dc4d8, #1ac4b0); }
-.num-p3-3 { background: linear-gradient(135deg, #14b8a6, #22c55e); }
-.num-p3-4 { background: linear-gradient(135deg, #1ac4b0, #4ade80); }
-.num-p3-5 { background: linear-gradient(135deg, #f59e0b, #fb7185); }
+/* ── Phase color gradients ── */
+.c-p1-1 { background: linear-gradient(135deg, #3b82f6, #6366f1); }
+.c-p1-2 { background: linear-gradient(135deg, #4f90f8, #7475f3); }
+.c-p1-3 { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+.c-p1-4 { background: linear-gradient(135deg, #7c7ef4, #9d7cf7); }
+.c-p1-5 { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }
+.c-p2-1 { background: linear-gradient(135deg, #8b5cf6, #a855f7); }
+.c-p2-2 { background: linear-gradient(135deg, #9d6cf8, #b67ef9); }
+.c-p2-3 { background: linear-gradient(135deg, #a855f7, #c084fc); }
+.c-p2-4 { background: linear-gradient(135deg, #b48bfb, #d1a8fd); }
+.c-p2-5 { background: linear-gradient(135deg, #c09cfc, #ddbefe); }
+.c-p3-1 { background: linear-gradient(135deg, #06b6d4, #14b8a6); }
+.c-p3-2 { background: linear-gradient(135deg, #0dc4d8, #22c55e); }
+.c-p3-3 { background: linear-gradient(135deg, #14b8a6, #3b82f6); }
+.c-p3-4 { background: linear-gradient(135deg, #6366f1, #06b6d4); }
+.c-p3-5 { background: linear-gradient(135deg, #f59e0b, #fb7185); }
 
-/* FOOTER */
-footer {
-  padding: 40px;
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  border-top: 1px solid rgba(255,255,255,0.05);
+/* ── Pixel canvas ── */
+#heroCanvas { display: none; }
+
+/* ── Floating nav dots (right side) ── */
+.phase-nav {
+  position: fixed;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 40;
 }
 
-@media (max-width: 640px) {
-  .roadmap-section { padding: 24px 20px 60px; }
-  .hero { padding: 60px 20px; }
-  .phase-pills-section { padding: 32px 20px 16px; }
-  .topic-card { padding: 16px 18px; }
+.phase-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  border: none;
+  padding: 0;
+}
+
+.phase-dot:hover, .phase-dot.active { background: var(--blue); transform: scale(1.4); }
+
+/* ── Reveal animation ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.rv1 { transition-delay: 0.05s; }
+.rv2 { transition-delay: 0.10s; }
+.rv3 { transition-delay: 0.15s; }
+.rv4 { transition-delay: 0.20s; }
+.rv5 { transition-delay: 0.25s; }
+
+/* ── Footer ── */
+.site-footer {
+  margin-left: 260px;
+  padding: 28px 48px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--text-3);
+}
+
+.footer-link {
+  color: var(--text-3);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.footer-link:hover { color: var(--text-2); }
+
+/* ── Mobile sidebar toggle ── */
+.menu-toggle {
+  display: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  border-radius: var(--r-sm);
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  .sidebar.open { transform: translateX(0); }
+  .shell { grid-template-columns: 1fr; }
+  .main, .site-footer { margin-left: 0; }
+  .hero, .content { padding-left: 24px; padding-right: 24px; }
+  .topbar { padding: 0 24px; }
+  .menu-toggle { display: flex; align-items: center; }
+  .phase-nav { display: none; }
 }
 </style>
 </head>
 <body>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-pixel-grid" id="heroGrid"></div>
-  <div class="hero-badge">IIITB Deep Learning Programme</div>
-  <h1 class="hero-title">ML & DL Learning Path</h1>
-  <p class="hero-subtitle">From data exploration to deep learning &nbsp;·&nbsp; 15 topics &nbsp;·&nbsp; guided sequence</p>
-  <div class="scroll-indicator">↓</div>
-</section>
-
-<!-- PHASE PILLS -->
-<div class="phase-pills-section reveal">
-  <div class="phase-pills">
-    <span class="phase-pill phase-pill-1">Phase 1: ML Foundations</span>
-    <span class="phase-pill phase-pill-2">Phase 2: Ensemble & Advanced</span>
-    <span class="phase-pill phase-pill-3">Phase 3: Deep Learning</span>
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">ML</div>
+    <div>
+      <div class="logo-text">ML Learning Primer</div>
+      <div class="logo-sub">IIITB Deep Learning · 2026</div>
+    </div>
   </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label">Overview</div>
+      <a href="#hero" class="nav-item active">
+        <span>🏠</span> Introduction
+      </a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Phase 1 — Foundations</div>
+      <a href="eda.html" class="nav-item">
+        <span class="nav-num c-p1-1">01</span> EDA &amp; Statistics
+      </a>
+      <a href="linear-regression.html" class="nav-item">
+        <span class="nav-num c-p1-2">02</span> Linear Regression
+      </a>
+      <a href="logistic-regression.html" class="nav-item">
+        <span class="nav-num c-p1-3">03</span> Logistic Regression
+      </a>
+      <a href="regularization.html" class="nav-item">
+        <span class="nav-num c-p1-4">04</span> Regularization
+      </a>
+      <a href="advanced-regression.html" class="nav-item">
+        <span class="nav-num c-p1-5">05</span> Advanced Regression
+      </a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Phase 2 — Ensemble</div>
+      <a href="decision-trees.html" class="nav-item">
+        <span class="nav-num c-p2-1">06</span> Decision Trees
+      </a>
+      <a href="random-forest.html" class="nav-item">
+        <span class="nav-num c-p2-2">07</span> Random Forest
+      </a>
+      <a href="boosting.html" class="nav-item">
+        <span class="nav-num c-p2-3">08</span> Boosting
+      </a>
+      <a href="svm.html" class="nav-item">
+        <span class="nav-num c-p2-4">09</span> SVM
+      </a>
+      <a href="naive-bayes.html" class="nav-item">
+        <span class="nav-num c-p2-5">10</span> Naive Bayes
+      </a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Phase 3 — Deep Learning</div>
+      <a href="clustering.html" class="nav-item">
+        <span class="nav-num c-p3-1">11</span> Clustering
+      </a>
+      <a href="pca.html" class="nav-item">
+        <span class="nav-num c-p3-2">12</span> PCA
+      </a>
+      <a href="model-selection.html" class="nav-item">
+        <span class="nav-num c-p3-3">13</span> Model Selection
+      </a>
+      <a href="neural-networks.html" class="nav-item">
+        <span class="nav-num c-p3-4">14</span> Neural Networks
+      </a>
+      <a href="CNN/index.html" class="nav-item">
+        <span class="nav-num c-p3-5">15</span> CNN Explainer
+      </a>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    15 topics · Zero dependencies
+  </div>
+</aside>
+
+<!-- Main -->
+<div class="main">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="menu-toggle" id="menuToggle">☰</button>
+      <div class="topbar-breadcrumb">
+        ML Learning Primer <span style="opacity:0.3;margin:0 2px;">/</span> <span>Introduction</span>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <a href="eda.html" class="topbar-btn">Start Learning →</a>
+      <a href="https://github.com/prasanth23590/ML-Learning-Primer" target="_blank" class="topbar-btn topbar-btn-primary">GitHub</a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero" id="hero">
+    <div class="hero-eyebrow">
+      <span class="hero-eyebrow-dot"></span>
+      IIITB Deep Learning Programme · 2026
+    </div>
+    <h1 class="hero-title">
+      <span class="hero-title-gradient">ML &amp; Deep Learning<br>Learning Path</span>
+    </h1>
+    <p class="hero-desc">
+      A curated sequence of 15 interactive topics — from exploratory data analysis to convolutional neural networks. Each page is self-contained, animated, and zero-dependency.
+    </p>
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num">15</div>
+        <div class="stat-label">Topics</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">3</div>
+        <div class="stat-label">Phases</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">10+</div>
+        <div class="stat-label">Interactive demos</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">0</div>
+        <div class="stat-label">Dependencies</div>
+      </div>
+    </div>
+    <div class="hero-divider"></div>
+  </section>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- Phase 1 -->
+    <section class="phase-section" id="phase1">
+      <div class="phase-heading reveal">
+        <span class="phase-tag p1-tag">Phase 1</span>
+        <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:var(--text-2);">ML Foundations</span>
+        <span class="phase-rule"></span>
+      </div>
+      <div class="topic-grid">
+        <a href="eda.html" class="topic-card reveal rv1">
+          <div class="topic-num c-p1-1">01</div>
+          <div class="topic-body">
+            <div class="topic-name">EDA &amp; Statistics</div>
+            <div class="topic-tagline">distributions · outliers · correlation · hypothesis testing</div>
+          </div>
+          <div class="topic-meta">
+            <span class="topic-type-badge">Animated</span>
+            <span class="topic-arrow">→</span>
+          </div>
+        </a>
+        <a href="linear-regression.html" class="topic-card reveal rv2">
+          <div class="topic-num c-p1-2">02</div>
+          <div class="topic-body">
+            <div class="topic-name">Linear Regression</div>
+            <div class="topic-tagline">OLS · gradient descent · R² · residual analysis</div>
+          </div>
+          <div class="topic-meta">
+            <span class="topic-type-badge">Interactive</span>
+            <span class="topic-arrow">→</span>
+          </div>
+        </a>
+        <a href="logistic-regression.html" class="topic-card reveal rv3">
+          <div class="topic-num c-p1-3">03</div>
+          <div class="topic-body">
+            <div class="topic-name">Logistic Regression</div>
+            <div class="topic-tagline">sigmoid · log-loss · decision boundary · confusion matrix</div>
+          </div>
+          <div class="topic-meta">
+            <span class="topic-type-badge">Interactive</span>
+            <span class="topic-arrow">→</span>
+          </div>
+        </a>
+        <a href="regularization.html" class="topic-card reveal rv4">
+          <div class="topic-num c-p1-4">04</div>
+          <div class="topic-body">
+            <div class="topic-name">Regularization</div>
+            <div class="topic-tagline">Ridge · Lasso · ElasticNet · bias-variance tradeoff</div>
+          </div>
+          <div class="topic-meta">
+            <span class="topic-type-badge">Animated</span>
+            <span class="topic-arrow">→</span>
+          </div>
+        </a>
+        <a href="advanced-regression.html" class="topic-card reveal rv5">
+          <div class="topic-num c-p1-5">05</div>
+          <div class="topic-body">
+            <div class="topic-name">Advanced Regression</div>
+            <div class="topic-tagline">polynomial features · interaction terms · non-linear fits</div>
+          </div>
+          <div class="topic-meta">
+            <span class="topic-type-badge">Animated</span>
+            <span class="topic-arrow">→</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- Phase 2 -->
+    <section class="phase-section" id="phase2">
+      <div class="phase-heading reveal">
+        <span class="phase-tag p2-tag">Phase 2</span>
+        <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:var(--text-2);">Ensemble &amp; Advanced</span>
+        <span class="phase-rule"></span>
+      </div>
+      <div class="topic-grid">
+        <a href="decision-trees.html" class="topic-card reveal rv1">
+          <div class="topic-num c-p2-1">06</div>
+          <div class="topic-body">
+            <div class="topic-name">Decision Trees</div>
+            <div class="topic-tagline">information gain · Gini · pruning · depth control</div>
+          </div>
+          <div class="topic-meta">
+            <span class="topic-type-badge">Interactive</span>
+            <span class="topic-arrow">→</span>
+          </div>
+        </a>
+        <a href="random-forest.html" class="topic-card reveal rv2">
+          <div class="topic-num c-p2-2">07</div>
+          <div class="topic-body">
+            <div class="topic-name">Random Forest</div>
+            <div class="topic-tagline">bagging · feature subsets · OOB error · feature importance</div>
+          </div>
+          <div class="topic-meta">
+            <span class="topic-type-badge">Animated</span>
+            <span class="topic-arrow">→</span>
+          </div>
+        </a>
+        <a href="boosting.html" class="topic-card reveal rv3">
+          <div class="topic-num c-p2-3">08</div>
+          <div class="topic-body">
+            <div class="topic-name">Boosting</div>
+            <div class="topic-tagline">AdaBoost · Gradient Boosting · XGBoost · learning rate</div>
+          </div>
+          <div class="topic-meta">
+            <span class="topic-type-badge">Animated</span>
+            <span class="topic-arrow">→</span>
+          </div>
+        </a>
+        <a href="svm.html" class="topic-card reveal rv4">
+          <div class="topic-num c-p2-4">09</div>
+          <div class="topic-body">
+            <div class="topic-name">Support Vector Machines</div>
+            <div class="topic-tagline">maximum margin · kernel trick · soft margin · SVR</div>
+          </div>
+          <div class="topic-meta">
+            <span class="topic-type-badge">Animated</span>
+            <span class="topic-arrow">→</span>
+          </div>
+        </a>
+        <a href="naive-bayes.html" class="topic-card reveal rv5">
+          <div class="topic-num c-p2-5">10</div>
+          <div class="topic-body">
+            <div class="topic-name">Naive Bayes</div>
+            <div class="topic-tagline">Bayes theorem · conditional independence · text classification</div>
+          </div>
+          <div class="topic-meta">
+            <span class="topic-type-badge">Animated</span>
+            <span class="topic-arrow">→</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- Phase 3 -->
+    <section class="phase-section" id="phase3">
+      <div class="phase-heading reveal">
+        <span class="phase-tag p3-tag">Phase 3</span>
+        <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:var(--text-2);">Deep Learning</span>
+        <span class="phase-rule"></span>
+      </div>
+      <div class="topic-grid">
+        <a href="clustering.html" class="topic-card reveal rv1">
+          <div class="topic-num c-p3-1">11</div>
+          <div class="topic-body">
+            <div class="topic-name">Clustering</div>
+            <div class="topic-tagline">K-Means · DBSCAN · hierarchical · silhouette score</div>
+          </div>
+          <div class="topic-meta">
+            <span class="topic-type-badge">Animated</span>
+            <span class="topic-arrow">→</span>
+          </div>
+        </a>
+        <a href="pca.html" class="topic-card reveal rv2">
+          <div class="topic-num c-p3-2">12</div>
+          <div class="topic-body">
+            <div class="topic-name">PCA</div>
+            <div class="topic-tagline">eigenvectors · variance explained · dimensionality reduction</div>
+          </div>
+          <div class="topic-meta">
+            <span class="topic-type-badge">Interactive</span>
+            <span class="topic-arrow">→</span>
+          </div>
+        </a>
+        <a href="model-selection.html" class="topic-card reveal rv3">
+          <div class="topic-num c-p3-3">13</div>
+          <div class="topic-body">
+            <div class="topic-name">Model Selection</div>
+            <div class="topic-tagline">cross-validation · AIC · BIC · hyperparameter tuning</div>
+          </div>
+          <div class="topic-meta">
+            <span class="topic-type-badge">Animated</span>
+            <span class="topic-arrow">→</span>
+          </div>
+        </a>
+        <a href="neural-networks.html" class="topic-card reveal rv4">
+          <div class="topic-num c-p3-4">14</div>
+          <div class="topic-body">
+            <div class="topic-name">Neural Networks</div>
+            <div class="topic-tagline">perceptron · backprop · activations · dense layers</div>
+          </div>
+          <div class="topic-meta">
+            <span class="topic-type-badge">Interactive</span>
+            <span class="topic-arrow">→</span>
+          </div>
+        </a>
+        <a href="CNN/index.html" class="topic-card reveal rv5">
+          <div class="topic-num c-p3-5">15</div>
+          <div class="topic-body">
+            <div class="topic-name">Convolutional Neural Networks</div>
+            <div class="topic-tagline">kernels · feature maps · pooling · transfer learning</div>
+          </div>
+          <div class="topic-meta">
+            <span class="topic-type-badge">3D Demo</span>
+            <span class="topic-arrow">→</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- Footer -->
+<footer class="site-footer">
+  <span>Built for IIITB Deep Learning Course · 2026</span>
+  <a href="https://github.com/prasanth23590/ML-Learning-Primer" target="_blank" class="footer-link">GitHub →</a>
+</footer>
+
+<!-- Phase nav dots -->
+<div class="phase-nav">
+  <button class="phase-dot active" data-target="phase1" title="Phase 1"></button>
+  <button class="phase-dot" data-target="phase2" title="Phase 2"></button>
+  <button class="phase-dot" data-target="phase3" title="Phase 3"></button>
 </div>
-
-<!-- ROADMAP -->
-<div class="roadmap-section">
-
-  <!-- Phase 1 -->
-  <div class="phase-header reveal">
-    <span class="phase-label phase-label-1">Phase 1 — ML Foundations</span>
-    <span class="phase-line"></span>
-  </div>
-
-  <div class="roadmap-track">
-    <a href="eda.html" class="topic-card reveal">
-      <div class="topic-num num-p1-1">01</div>
-      <div class="topic-body">
-        <div class="topic-name">EDA &amp; Statistics</div>
-        <div class="topic-tagline">Distributions · outliers · correlation · hypothesis testing</div>
-      </div>
-      <span class="topic-arrow">→</span>
-    </a>
-    <a href="linear-regression.html" class="topic-card reveal reveal-delay-1">
-      <div class="topic-num num-p1-2">02</div>
-      <div class="topic-body">
-        <div class="topic-name">Linear Regression</div>
-        <div class="topic-tagline">OLS · gradient descent · R² · residual analysis</div>
-      </div>
-      <span class="topic-arrow">→</span>
-    </a>
-    <a href="logistic-regression.html" class="topic-card reveal reveal-delay-2">
-      <div class="topic-num num-p1-3">03</div>
-      <div class="topic-body">
-        <div class="topic-name">Logistic Regression</div>
-        <div class="topic-tagline">Sigmoid · log-loss · decision boundary · confusion matrix</div>
-      </div>
-      <span class="topic-arrow">→</span>
-    </a>
-    <a href="regularization.html" class="topic-card reveal reveal-delay-3">
-      <div class="topic-num num-p1-4">04</div>
-      <div class="topic-body">
-        <div class="topic-name">Regularization</div>
-        <div class="topic-tagline">Ridge · Lasso · ElasticNet · bias-variance tradeoff</div>
-      </div>
-      <span class="topic-arrow">→</span>
-    </a>
-    <a href="advanced-regression.html" class="topic-card reveal reveal-delay-1">
-      <div class="topic-num num-p1-5">05</div>
-      <div class="topic-body">
-        <div class="topic-name">Advanced Regression</div>
-        <div class="topic-tagline">Polynomial features · interaction terms · non-linear fits</div>
-      </div>
-      <span class="topic-arrow">→</span>
-    </a>
-  </div>
-
-  <!-- Phase 2 -->
-  <div class="phase-header reveal">
-    <span class="phase-label phase-label-2">Phase 2 — Ensemble &amp; Advanced</span>
-    <span class="phase-line"></span>
-  </div>
-
-  <div class="roadmap-track">
-    <a href="decision-trees.html" class="topic-card reveal">
-      <div class="topic-num num-p2-1">06</div>
-      <div class="topic-body">
-        <div class="topic-name">Decision Trees</div>
-        <div class="topic-tagline">Information gain · Gini · pruning · depth control</div>
-      </div>
-      <span class="topic-arrow">→</span>
-    </a>
-    <a href="random-forest.html" class="topic-card reveal reveal-delay-1">
-      <div class="topic-num num-p2-2">07</div>
-      <div class="topic-body">
-        <div class="topic-name">Random Forest</div>
-        <div class="topic-tagline">Bagging · feature subsets · OOB error · feature importance</div>
-      </div>
-      <span class="topic-arrow">→</span>
-    </a>
-    <a href="boosting.html" class="topic-card reveal reveal-delay-2">
-      <div class="topic-num num-p2-3">08</div>
-      <div class="topic-body">
-        <div class="topic-name">Boosting</div>
-        <div class="topic-tagline">AdaBoost · Gradient Boosting · XGBoost · learning rate</div>
-      </div>
-      <span class="topic-arrow">→</span>
-    </a>
-    <a href="svm.html" class="topic-card reveal reveal-delay-3">
-      <div class="topic-num num-p2-4">09</div>
-      <div class="topic-body">
-        <div class="topic-name">Support Vector Machines</div>
-        <div class="topic-tagline">Maximum margin · kernel trick · soft margin · SVR</div>
-      </div>
-      <span class="topic-arrow">→</span>
-    </a>
-    <a href="naive-bayes.html" class="topic-card reveal reveal-delay-1">
-      <div class="topic-num num-p2-5">10</div>
-      <div class="topic-body">
-        <div class="topic-name">Naive Bayes</div>
-        <div class="topic-tagline">Bayes theorem · conditional independence · text classification</div>
-      </div>
-      <span class="topic-arrow">→</span>
-    </a>
-  </div>
-
-  <!-- Phase 3 -->
-  <div class="phase-header reveal">
-    <span class="phase-label phase-label-3">Phase 3 — Deep Learning</span>
-    <span class="phase-line"></span>
-  </div>
-
-  <div class="roadmap-track">
-    <a href="clustering.html" class="topic-card reveal">
-      <div class="topic-num num-p3-1">11</div>
-      <div class="topic-body">
-        <div class="topic-name">Clustering</div>
-        <div class="topic-tagline">K-Means · DBSCAN · hierarchical · silhouette score</div>
-      </div>
-      <span class="topic-arrow">→</span>
-    </a>
-    <a href="pca.html" class="topic-card reveal reveal-delay-1">
-      <div class="topic-num num-p3-2">12</div>
-      <div class="topic-body">
-        <div class="topic-name">PCA</div>
-        <div class="topic-tagline">Eigenvectors · variance explained · dimensionality reduction</div>
-      </div>
-      <span class="topic-arrow">→</span>
-    </a>
-    <a href="model-selection.html" class="topic-card reveal reveal-delay-2">
-      <div class="topic-num num-p3-3">13</div>
-      <div class="topic-body">
-        <div class="topic-name">Model Selection</div>
-        <div class="topic-tagline">Cross-validation · AIC · BIC · hyperparameter tuning</div>
-      </div>
-      <span class="topic-arrow">→</span>
-    </a>
-    <a href="neural-networks.html" class="topic-card reveal reveal-delay-3">
-      <div class="topic-num num-p3-4">14</div>
-      <div class="topic-body">
-        <div class="topic-name">Neural Networks</div>
-        <div class="topic-tagline">Perceptron · backprop · activations · dense layers</div>
-      </div>
-      <span class="topic-arrow">→</span>
-    </a>
-    <a href="CNN/index.html" class="topic-card reveal reveal-delay-1">
-      <div class="topic-num num-p3-5">15</div>
-      <div class="topic-body">
-        <div class="topic-name">Convolutional Neural Networks</div>
-        <div class="topic-tagline">Kernels · feature maps · pooling · transfer learning</div>
-      </div>
-      <span class="topic-arrow">→</span>
-    </a>
-  </div>
-
-</div>
-
-<!-- FOOTER -->
-<footer>Built for IIITB Deep Learning Course · 2026</footer>
 
 <script>
-(function() {
-  // Hero pixel grid
-  var grid = document.getElementById('heroGrid');
-  var colors = [
-    '#3b82f6','#6366f1','#8b5cf6','#06b6d4','#14b8a6',
-    '#a78bfa','#fb7185','#f59e0b','#4f90f8','#9868f8'
-  ];
-  for (var i = 0; i < 196; i++) {
-    var cell = document.createElement('div');
-    cell.className = 'hero-pixel-cell';
-    cell.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-    cell.style.setProperty('--delay', (Math.random() * 3) + 's');
-    grid.appendChild(cell);
+(function(){
+  // Mobile sidebar toggle
+  var sidebar = document.getElementById('sidebar');
+  var toggle = document.getElementById('menuToggle');
+  if(toggle) {
+    toggle.addEventListener('click', function(){
+      sidebar.classList.toggle('open');
+    });
+    document.addEventListener('click', function(e){
+      if(!sidebar.contains(e.target) && e.target !== toggle) {
+        sidebar.classList.remove('open');
+      }
+    });
   }
 
-  // Scroll reveal
-  var observer = new IntersectionObserver(function(entries) {
-    entries.forEach(function(e) {
-      if (e.isIntersecting) e.target.classList.add('visible');
+  // Phase nav dots
+  var dots = document.querySelectorAll('.phase-dot');
+  dots.forEach(function(dot){
+    dot.addEventListener('click', function(){
+      var id = dot.getAttribute('data-target');
+      var el = document.getElementById(id);
+      if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
     });
-  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  });
 
-  document.querySelectorAll('.reveal').forEach(function(el) { observer.observe(el); });
+  // Active dot on scroll
+  var phases = ['phase1','phase2','phase3'];
+  var phaseEls = phases.map(function(id){ return document.getElementById(id); });
+  function updateDots(){
+    var scrollY = window.scrollY + window.innerHeight * 0.4;
+    var active = 0;
+    phaseEls.forEach(function(el, i){
+      if(el && el.offsetTop <= scrollY) active = i;
+    });
+    dots.forEach(function(d,i){ d.classList.toggle('active', i === active); });
+  }
+  window.addEventListener('scroll', updateDots, {passive:true});
+
+  // Scroll reveal
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting) e.target.classList.add('visible'); });
+  }, {threshold: 0.08, rootMargin: '0px 0px -32px 0px'});
+  document.querySelectorAll('.reveal').forEach(function(el){ obs.observe(el); });
+
+  // Highlight active sidebar item
+  var navItems = document.querySelectorAll('.sidebar .nav-item');
+  var current = window.location.pathname.split('/').pop() || 'index.html';
+  navItems.forEach(function(item){
+    var href = (item.getAttribute('href') || '').split('/').pop();
+    if(href === current || (current === '' && href === '#hero')) {
+      item.classList.add('active');
+    }
+  });
 })();
 </script>
 </body>
