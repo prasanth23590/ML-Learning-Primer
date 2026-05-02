@@ -63,7 +63,8 @@
   font-family: 'DM Sans', -apple-system, sans-serif;
 }
 
-/* Hide floating ← Hub pill on all topic pages (topbar replaces it) */
+/* Hide floating ← Hub pill on all topic pages (topbar replaces it).
+   NOTE: pill must be a direct child of <body> for this selector to work. */
 body > a[href="index.html"],
 body > a[href="../index.html"] {
   display: none !important;
@@ -71,7 +72,7 @@ body > a[href="../index.html"] {
 
 /* Push content below topbar */
 body {
-  padding-top: 48px;
+  padding-top: 48px !important;
 }
 
 /* ── Universal mobile layout fixes for topic pages ── */
@@ -90,10 +91,6 @@ body {
 @media (max-width: 480px) {
   .glass-card { padding: 20px !important; }
   .hero-section { padding: 40px 16px 32px !important; }
-}
-
-/* ── CNN: hide 3D perspective layer on very small screens ── */
-@media (max-width: 480px) {
   #conv3dContainer,
   .conv-3d-container { display: none !important; }
 }
