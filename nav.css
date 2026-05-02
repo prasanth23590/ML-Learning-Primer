@@ -1,0 +1,107 @@
+/* ── Site topbar (injected by nav.js on all topic pages) ── */
+#site-topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: rgba(7, 9, 15, 0.75);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 8px;
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  box-sizing: border-box;
+}
+
+#site-topbar a {
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: color 0.15s;
+  flex-shrink: 0;
+}
+
+#site-topbar a:hover { color: #fff; }
+
+.topbar-center {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+  flex: 1;
+  justify-content: center;
+}
+
+.topbar-badge {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+
+.topbar-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: 'DM Sans', -apple-system, sans-serif;
+}
+
+/* Hide floating ← Hub pill on all topic pages (topbar replaces it) */
+body > a[href="index.html"],
+body > a[href="../index.html"] {
+  display: none !important;
+}
+
+/* Push content below topbar */
+body {
+  padding-top: 48px;
+}
+
+/* ── Universal mobile layout fixes for topic pages ── */
+@media (max-width: 768px) {
+  .section { padding: 48px 20px !important; }
+  .section-compact { padding: 32px 20px !important; }
+  .stage-content { grid-template-columns: 1fr !important; }
+  .takeaways-grid { grid-template-columns: 1fr !important; }
+  .pros-cons { grid-template-columns: 1fr !important; }
+  .stage-container,
+  .demo-container { width: 100% !important; max-width: 100% !important; }
+  .stage-visual { min-height: 160px; }
+  .nav-bar { display: none; } /* redundant with topbar prev/next */
+}
+
+@media (max-width: 480px) {
+  .glass-card { padding: 20px !important; }
+  .hero-section { padding: 40px 16px 32px !important; }
+}
+
+/* ── CNN: hide 3D perspective layer on very small screens ── */
+@media (max-width: 480px) {
+  #conv3dContainer,
+  .conv-3d-container { display: none !important; }
+}
+
+/* Canvas touch support */
+canvas {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  max-width: 100%;
+}
